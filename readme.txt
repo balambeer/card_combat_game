@@ -15,7 +15,7 @@ Gameplay ideas
 Implementation steps
 --------------------
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
-- readability: animate cards moving between decks, trick resolution & damage
+- readability: animate trick resolution & damage
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu

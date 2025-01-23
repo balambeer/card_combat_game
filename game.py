@@ -19,6 +19,7 @@ class Game:
         self.delta_time = 0
         
         self.is_player_1_leading = True
+        self.trick_resolved = False
 
         self.player_1 = Player(game = self,
                                is_left_player = True,
@@ -74,12 +75,7 @@ class Game:
             else:
                 leading_player_won = False
                 damage = following_value
-                
-#         if leading_player_won:
-#             damage = max(0, following_value - leading_value)
-#         else:
-#             damage = max(0, leading_value - following_value)
-            
+                  
         if self.is_player_1_leading:
             if leading_player_won:
                 print("    player 2 takes " + str(damage) + " damage")
@@ -108,31 +104,15 @@ class Game:
         else:
             self.delta_time = self.clock.tick(settings.fps)
             # update game objects
-            if not self.player_1.play_area.is_empty() and not self.player_2.play_area.is_empty() and not (self.player_1.animation_in_progress or self.player_2.animation_in_progress):
+            if self.player_1.played_card and self.player_2.played_card and not self.trick_resolved:
                 self.resolve_trick()
-                self.player_1.animation_in_progress = True
-                self.player_1.listening_to_inputs = False
-                self.player_2.animation_in_progress = True
-                self.player_2.listening_to_inputs = False
-            if self.player_1.animation_in_progress:
-                self.player_1.slide_cards(from_deck = self.player_1.play_area,
-                                          to_deck = self.player_1.discard_pile,
-                                          n_cards_to_slide = 1,
-                                          slide_time_in_ms = 500)
-            if self.player_2.animation_in_progress:
-                self.player_2.slide_cards(from_deck = self.player_2.play_area,
-                                          to_deck = self.player_2.discard_pile,
-                                          n_cards_to_slide = 1,
-                                          slide_time_in_ms = 500)
-            if not self.player_1.listening_to_inputs and not self.player_1.animation_in_progress:
-                self.player_1.clear_play_area()
-                self.player_1.update_decks()
-            if not self.player_2.listening_to_inputs and not self.player_2.animation_in_progress:
-                self.player_2.clear_play_area()
-                self.player_2.update_decks()
-            else:
-                self.player_1.listen_to_card_played()
-                self.player_2.listen_to_card_played()
+                self.trick_resolved = True
+
+            self.player_1.update()
+            self.player_2.update()
+                
+            if self.player_1.listening_to_inputs and self.player_2.listening_to_inputs:
+                self.trick_resolved = False
             
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         

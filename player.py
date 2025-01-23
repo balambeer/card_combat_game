@@ -18,16 +18,17 @@ class Player:
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         
-        self.animation_in_progress = False
+        self.todo_clear_play_area = False
+        self.todo_replenish_draw_deck = False
+        self.todo_draw_a_card_to_hand = False
+        
         self.listening_to_inputs = False
-
+        self.played_card = False
+        
         self.draw_deck = self.create_draw_deck(card_list, self.is_left_player)
         self.hand = self.create_hand(self.is_left_player)
         self.discard_pile = self.create_discard_pile(self.is_left_player)
         self.play_area = self.create_play_area(self.is_left_player)
-        
-        for i in range(settings.player_hand_size):
-            self.update_decks()
         
     def set_hp_rect(self, is_left_player):
         hp_rect_center_left = int(settings.player_hp_rect_center_ratio.x * settings.screen_width)
@@ -106,48 +107,7 @@ class Player:
         self.discard_pile.draw()
         self.play_area.draw()
         self.display_hp()
-        
-    def replenish_draw_deck(self):
-        for i in range(len(self.discard_pile.card_list)):
-            # pg.time.wait(50)
-            self.draw_deck.add_card(self.discard_pile.card_list.pop())
-        self.draw_deck.shuffle()
-        self.draw_deck.set_card_positions()
-        self.draw_deck.set_deck_rect()
-        self.discard_pile.set_card_positions()
-        self.discard_pile.set_deck_rect()
-        
-    def replenish_hand(self):
-        n_cards_in_draw_deck = len(self.draw_deck.card_list)
-        n_cards_to_draw_at_first = min(settings.player_hand_size, n_cards_in_draw_deck)
-        for i in range(n_cards_to_draw_at_first):
-            # pg.time.wait(250)
-            card = self.draw_deck.card_list.pop()
-            self.draw_deck.set_card_positions()
-            self.draw_deck.set_deck_rect()
-            card.face_up = True
-            card.draggable = True
-            self.hand.add_card(card)
-        if n_cards_to_draw_at_first < settings.player_hand_size:
-            self.replenish_draw_deck()
-            n_cards_still_needed = settings.player_hand_size - n_cards_to_draw_at_first
-            for i in range(min(n_cards_still_needed, len(self.draw_deck.card_list))):
-                # pg.time.wait(250)
-                card = self.draw_deck.card_list.pop()
-                self.draw_deck.set_card_positions()
-                self.draw_deck.set_deck_rect()
-                card.face_up = True
-                card.draggable = True
-                self.hand.add_card(card)
-        
-    def draw_a_card_to_hand(self):
-        card = self.draw_deck.card_list.pop()
-        self.draw_deck.set_card_positions()
-        self.draw_deck.set_deck_rect()
-        card.face_up = True
-        card.draggable = True
-        self.hand.add_card(card)
-        
+                
     def listen_to_card_played(self):
         self.hand.update()
         if not self.hand.selected_card_index is None:
@@ -161,34 +121,14 @@ class Player:
                     self.hand.remove_card(card)
                     
                     self.play_area.add_card(card)
+                    self.listening_to_inputs = False
+                    self.played_card = True
                 else:
                     self.hand.active_card_index = None
                     self.hand.selected_card_index = None
                     self.hand.set_card_positions()
                     self.hand.set_deck_rect()
-                    
-    def update_decks(self):
-        if self.hp > 0 and not self.listening_to_inputs:
-            if len(self.hand.card_list) < settings.player_hand_size:
-                if not self.draw_deck.is_empty():
-                    self.draw_a_card_to_hand()
-                elif not self.discard_pile.is_empty():
-                    self.replenish_draw_deck()
-                    self.draw_a_card_to_hand()
-                else:
-                    self.listening_to_inputs = True
-            else:
-                self.listening_to_inputs = True
-            if self.hand.is_empty():
-                self.hp = 0
-    
-    def clear_play_area(self):
-        if not self.play_area.is_empty():
-            for card in self.play_area.card_list:
-                card.flip()
-                self.play_area.remove_card(card)
-                self.discard_pile.add_card(card)
-            
+      
     def slide_cards(self, from_deck, to_deck, n_cards_to_slide, slide_time_in_ms):
         n_steps = (slide_time_in_ms / 1000) * settings.fps
         v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
@@ -202,26 +142,90 @@ class Player:
             if (new_top - to_deck.top) * (from_deck.top - to_deck.top) <= 0:
                 new_top = to_deck.top
             from_deck.card_list[i].update_position(new_left, new_top)
-        if from_deck.card_list[num_cards_to_slide - 1].left == to_deck.left and from_deck.card_list[num_cards_to_slide - 1].top == to_deck.top:
-            self.animation_in_progress = False
                 
     def take_damage(self, damage):
         self.hp = max(0, self.hp - damage)
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         
-#     def update(self):
-#         if self.hp > 0:
-#             if len(self.hand.card_list) < settings.player_hand_size:
-#                 if not self.draw_deck.is_empty():
-#                     self.draw_a_card_to_hand()
-#                 elif not self.discard_pile.is_empty():
-#                     self.replenish_draw_deck()
-#             if self.hand.is_empty():
-#                 self.hp = 0
-#             else:
-#                 # TODO: rename this so that it's clear that we listen to player inputs here
-#                 self.hand.update()
-#                 self.listen_to_card_played()
+    def is_slide_animation_finished(self, from_deck, to_deck, n_cards_to_slide):
+        num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
+        return from_deck.card_list[num_cards_to_slide - 1].left == to_deck.left and from_deck.card_list[num_cards_to_slide - 1].top == to_deck.top
+            
+    def clear_play_area(self):
+        self.slide_cards(from_deck = self.play_area,
+                         to_deck = self.discard_pile,
+                         n_cards_to_slide = 1,
+                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+        if self.is_slide_animation_finished(from_deck = self.play_area,
+                                  to_deck = self.discard_pile,
+                                  n_cards_to_slide = 1):
+            for card in self.play_area.card_list:
+                card.flip()
+                self.play_area.remove_card(card)
+                self.discard_pile.add_card(card)
+            self.todo_clear_play_area = False
+            self.played_card = False
+            
+    def replenish_draw_deck(self):
+        self.slide_cards(from_deck = self.discard_pile,
+                         to_deck = self.draw_deck,
+                         n_cards_to_slide = len(self.discard_pile.card_list),
+                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+        if self.is_slide_animation_finished(from_deck = self.discard_pile,
+                                            to_deck = self.draw_deck,
+                                            n_cards_to_slide = len(self.discard_pile.card_list)):
+            for i in range(len(self.discard_pile.card_list)):
+                self.draw_deck.add_card(self.discard_pile.card_list.pop())
+            self.draw_deck.shuffle()
+            self.draw_deck.set_card_positions()
+            self.draw_deck.set_deck_rect()
+            self.discard_pile.set_card_positions()
+            self.discard_pile.set_deck_rect()
+            self.todo_replenish_draw_deck = False
+        
+    def draw_a_card_to_hand(self):
+        self.slide_cards(from_deck = self.draw_deck,
+                         to_deck = self.hand,
+                         n_cards_to_slide = 1,
+                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+        if self.is_slide_animation_finished(from_deck = self.draw_deck,
+                                            to_deck = self.hand,
+                                            n_cards_to_slide = 1):
+            card = self.draw_deck.card_list.pop()
+            self.draw_deck.set_card_positions()
+            self.draw_deck.set_deck_rect()
+            card.face_up = True
+            card.draggable = True
+            self.hand.add_card(card)
+            self.todo_draw_a_card_to_hand = False
+        
+    def update_todo_list(self):
+        if self.game.trick_resolved and self.played_card:
+            self.todo_clear_play_area = True
+            self.listening_to_inputs = False
+        else:
+            if len(self.hand.card_list) < settings.player_hand_size and not self.played_card:
+                if not self.draw_deck.is_empty():
+                    self.todo_draw_a_card_to_hand = True
+                elif not self.discard_pile.is_empty():
+                    self.todo_replenish_draw_deck = True
+                else:
+                    self.listening_to_inputs = True
+            else:
+                self.listening_to_inputs = True
+        
+    def update(self):
+        self.update_todo_list()
+        
+        if self.listening_to_inputs:
+            self.listen_to_card_played()
+        else:
+            if self.todo_clear_play_area:
+                self.clear_play_area()
+            elif self.todo_replenish_draw_deck:
+                self.replenish_draw_deck()
+            elif self.todo_draw_a_card_to_hand:
+                self.draw_a_card_to_hand()
         
             

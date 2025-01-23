@@ -6,6 +6,9 @@ screen_half_width = screen_width // 2
 screen_half_height = screen_height // 2
 fps = 30
 
+### Gameplay animations
+animation_card_slide_time_in_ms = 250
+
 ### Menu Text
 menu_font_size = screen_height // 10
 
