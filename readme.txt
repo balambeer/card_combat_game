@@ -19,7 +19,7 @@ Implementation steps
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu
-- handle whos players turn it is
+- handle whos players turn it is (done but maybe can be done better?)
 - enable playing against computer
 
 Current stuff

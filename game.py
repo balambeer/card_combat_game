@@ -104,6 +104,11 @@ class Game:
         else:
             self.delta_time = self.clock.tick(settings.fps)
             # update game objects
+            if (self.is_player_1_leading and not self.player_1.played_card) or (not self.is_player_1_leading and self.player_2.played_card):
+                self.player_1.is_my_turn = True
+            if (not self.is_player_1_leading and not self.player_2.played_card) or (self.is_player_1_leading and self.player_1.played_card):
+                self.player_2.is_my_turn = True
+            
             if self.player_1.played_card and self.player_2.played_card and not self.trick_resolved:
                 self.resolve_trick()
                 self.trick_resolved = True
@@ -111,7 +116,7 @@ class Game:
             self.player_1.update()
             self.player_2.update()
                 
-            if self.player_1.listening_to_inputs and self.player_2.listening_to_inputs:
+            if (self.is_player_1_leading and self.player_1.listening_to_inputs) or (not self.is_player_1_leading and self.player_2.listening_to_inputs):
                 self.trick_resolved = False
             
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')

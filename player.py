@@ -24,6 +24,7 @@ class Player:
         
         self.listening_to_inputs = False
         self.played_card = False
+        self.is_my_turn = False
         
         self.draw_deck = self.create_draw_deck(card_list, self.is_left_player)
         self.hand = self.create_hand(self.is_left_player)
@@ -166,6 +167,7 @@ class Player:
                 self.discard_pile.add_card(card)
             self.todo_clear_play_area = False
             self.played_card = False
+            self.is_my_turn = False
             
     def replenish_draw_deck(self):
         self.slide_cards(from_deck = self.discard_pile,
@@ -210,9 +212,9 @@ class Player:
                     self.todo_draw_a_card_to_hand = True
                 elif not self.discard_pile.is_empty():
                     self.todo_replenish_draw_deck = True
-                else:
+                elif self.is_my_turn:
                     self.listening_to_inputs = True
-            else:
+            elif self.is_my_turn:
                 self.listening_to_inputs = True
         
     def update(self):
