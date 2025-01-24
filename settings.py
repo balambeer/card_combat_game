@@ -58,3 +58,6 @@ player_right_hand_left = player_right_draw_deck_left - player_hand_and_draw_deck
 player_hp_size_ratio = 0.1
 player_hp_size = int(player_hp_size_ratio * screen_height)
 player_hp_rect_center_ratio = support.XY(0.25, 0.35)
+
+player_damage_animation_length_in_ms = 1000
+player_damage_drift_v = int(0.5 * screen_height) / player_damage_animation_length_in_ms

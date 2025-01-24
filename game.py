@@ -81,20 +81,24 @@ class Game:
                 print("    player 2 takes " + str(damage) + " damage")
                 print("    player 1 leads next")
                 self.player_2.take_damage(damage)
+                self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
             else:
                 print("    player 1 takes " + str(damage) + " damage")
                 print("    player 2 leads next")
                 self.player_1.take_damage(damage)
+                self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
                 self.is_player_1_leading = not self.is_player_1_leading
         else:
             if leading_player_won:
                 print("    player 1 takes " + str(damage) + " damage")
                 print("    player 2 leads next")
                 self.player_1.take_damage(damage)
+                self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
             else:
                 print("    player 2 takes " + str(damage) + " damage")
                 print("    player 1 leads next")
                 self.player_2.take_damage(damage)
+                self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
                 self.is_player_1_leading = not self.is_player_1_leading            
     
     def update_game_state(self):

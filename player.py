@@ -22,6 +22,10 @@ class Player:
         self.todo_replenish_draw_deck = False
         self.todo_draw_a_card_to_hand = False
         
+        self.damage_animation_clock = 0
+        self.damage_rendered = self.font.render(str(0), False, self.color)
+        self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
+        
         self.listening_to_inputs = False
         self.played_card = False
         self.is_my_turn = False
@@ -102,12 +106,20 @@ class Player:
     def display_hp(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
         
+    def display_damage(self):
+        self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - settings.player_damage_drift_v * self.game.delta_time),
+                                (self.damage_rect.width, self.damage_rect.height))
+        self.game.program.screen.blit(self.damage_rendered, self.damage_rect)
+        
     def draw(self):
         self.draw_deck.draw()
         self.hand.draw()
         self.discard_pile.draw()
         self.play_area.draw()
         self.display_hp()
+        if self.damage_animation_clock > 0:
+            self.damage_animation_clock -= self.game.delta_time
+            self.display_damage()
                 
     def listen_to_card_played(self):
         self.hand.update()
@@ -145,6 +157,9 @@ class Player:
             from_deck.card_list[i].update_position(new_left, new_top)
                 
     def take_damage(self, damage):
+        self.damage_rendered = self.font.render(str(-damage), False, self.color)
+        self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
+        
         self.hp = max(0, self.hp - damage)
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)

@@ -15,7 +15,8 @@ Gameplay ideas
 Implementation steps
 --------------------
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
-- readability: animate trick resolution & damage
+- readability: animate trick resolution
+- battle over screen (enough if we just freeze, or let the damage animation play out).
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu
@@ -24,4 +25,4 @@ Implementation steps
 
 Current stuff
 -------------
-- Animate sliding cards: better handle animation control...
+- Animate trick resolution & damage...
