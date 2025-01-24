@@ -155,14 +155,14 @@ class Card():
     def update_position(self, left, top):
         self.left = left
         self.top = top
-        self.card_rect = pg.Rect((self.left, self.top),
+        self.card_rect.update((self.left, self.top),
                                  (int(settings.card_width), int(settings.card_height)))
-        self.back_rect = pg.Rect((self.left + settings.card_back_border_width,
+        self.back_rect.update((self.left + settings.card_back_border_width,
                                   self.top + settings.card_back_border_width),
                                  (settings.card_width - 2 * settings.card_back_border_width,
                                   settings.card_height - 2 * settings.card_back_border_width))
-        self.value_rect = self.value_rendered.get_rect(center = (int(self.left + settings.card_value_center.x * settings.card_width),
-                                                                 int(self.top + settings.card_value_center.y * settings.card_height)))
+        self.value_rect.update(self.value_rendered.get_rect(center = (int(self.left + settings.card_value_center.x * settings.card_width),
+                                                                      int(self.top + settings.card_value_center.y * settings.card_height))))
     
     def flip(self):
         self.face_up = not self.face_up
