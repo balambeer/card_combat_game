@@ -45,60 +45,54 @@ class Game:
         a_player_died = self.player_1.hp <= 0 or self.player_2.hp <= 0
         return a_player_died or pg.mouse.get_pressed()[2]
     
+    def determine_damage_and_next_leader(self, leading_card, following_card):
+        if leading_card.suit == following_card.suit:
+            if leading_card.value > following_card.value:
+                return (0, self.is_player_1_leading)
+            else:
+                return (0, not self.is_player_1_leading)
+        else:
+            if following_card.suit == "diamonds":
+                return (following_card.value, not self.is_player_1_leading)
+            else:
+                return (leading_card.value, self.is_player_1_leading)
+    
     def resolve_trick(self):
         print("Trick Resolution:")
         if self.is_player_1_leading:
-            leading_suit = self.player_1.play_area.card_list[0].suit
-            leading_value = self.player_1.play_area.card_list[0].value
-            following_suit = self.player_2.play_area.card_list[0].suit
-            following_value = self.player_2.play_area.card_list[0].value
-            print("  Player 1 led with " + str(leading_value) + " of " + leading_suit)
-            print("  Player 2 followed with " + str(following_value) + " of " + following_suit)
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.player_1.play_area.card_list[0],
+                                                                         self.player_2.play_area.card_list[0])
         else:
-            leading_suit = self.player_2.play_area.card_list[0].suit
-            leading_value = self.player_2.play_area.card_list[0].value
-            following_suit = self.player_1.play_area.card_list[0].suit
-            following_value = self.player_1.play_area.card_list[0].value
-            print("  Player 2 led with " + str(leading_value) + " of " + leading_suit)
-            print("  Player 1 followed with " + str(following_value) + " of " + following_suit)
-        
-        if leading_suit == following_suit:
-            if leading_value > following_value:
-                leading_player_won = True
-            else:
-                leading_player_won = False
-            damage = 0
-        if not leading_suit == following_suit:
-            if not following_suit == "diamonds":
-                leading_player_won = True
-                damage = leading_value
-            else:
-                leading_player_won = False
-                damage = following_value
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.player_2.play_area.card_list[0],
+                                                                         self.player_1.play_area.card_list[0])
                   
         if self.is_player_1_leading:
-            if leading_player_won:
-                print("    player 2 takes " + str(damage) + " damage")
+            if damage_and_next_lead[1]:
+                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.player_2.take_damage(damage)
-                self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                if damage_and_next_lead[0] > 0:
+                    self.player_2.take_damage(damage_and_next_lead[0])
+                    self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
             else:
-                print("    player 1 takes " + str(damage) + " damage")
+                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.player_1.take_damage(damage)
-                self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                if damage_and_next_lead[0] > 0:
+                    self.player_1.take_damage(damage_and_next_lead[0])
+                    self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
                 self.is_player_1_leading = not self.is_player_1_leading
         else:
-            if leading_player_won:
-                print("    player 1 takes " + str(damage) + " damage")
+            if not damage_and_next_lead[1]:
+                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.player_1.take_damage(damage)
-                self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                if damage_and_next_lead[0] > 0:
+                    self.player_1.take_damage(damage_and_next_lead[0])
+                    self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
             else:
-                print("    player 2 takes " + str(damage) + " damage")
+                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.player_2.take_damage(damage)
-                self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                if damage_and_next_lead[0] > 0:
+                    self.player_2.take_damage(damage_and_next_lead[0])
+                    self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
                 self.is_player_1_leading = not self.is_player_1_leading            
     
     def update_game_state(self):
