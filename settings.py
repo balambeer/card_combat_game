@@ -57,7 +57,15 @@ player_right_hand_left = player_right_draw_deck_left - player_hand_and_draw_deck
 player_left_character_animation_center_x = int(0.25 * screen_width)
 player_right_character_animation_center_x = int(0.75 * screen_width)
 player_character_animation_center_y = int(0.5 * screen_height)
-player_character_animation_idle_frame_count = 10
+player_character_animation_idle_frame_count = 30
+player_character_animation_pain_frame_count = 30
+player_character_animation_blocked_frame_count = 30
+player_character_animation_attack_frame_count = 30
+player_character_animation_riposte_frame_count = 60
+player_character_animation_riposte_pain_frame_count = 60
+player_character_animation_riposte_blocked_frame_count = 60
+player_character_animation_death_frame_count = 90
+player_character_animation_killing_blow_frame_count = 90
 
 player_hp_size_ratio = 0.1
 player_hp_size = int(player_hp_size_ratio * screen_height)

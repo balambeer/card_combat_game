@@ -32,7 +32,8 @@ class Player:
         
         self.character_animation_state = "idle"
         self.character_animation_frame = 0
-        self.character_animation_rendered = self.font.render(self.character_animation_state + " " + str(self.character_animation_frame), False, self.color)
+        # self.character_animation_rendered = self.font.render(self.character_animation_state + " " + str(self.character_animation_frame), False, self.color)
+        self.character_animation_rendered = self.font.render(self.character_animation_state, False, self.color)
         self.character_animation_rect = self.set_character_animation_rect()
         
         self.draw_deck = self.create_draw_deck(card_list, self.is_left_player)
@@ -125,12 +126,17 @@ class Player:
         self.game.program.screen.blit(self.damage_rendered, self.damage_rect)
         
     def display_character(self):
-        if self.character_animation_frame == 0:
-            self.character_animation_state = "idle"
-            self.character_animation_frame = settings.player_character_animation_idle_frame_count
-        else:
-            self.character_animation_frame -= 1
-        self.character_animation_rendered = self.font.render(self.character_animation_state + " " + str(self.character_animation_frame),
+#         if self.character_animation_frame == 0:
+#             if not (self.character_animation_state == "death" or self.character_animation_state == "killing_blow"):
+#                 if is_leading_player:
+#                     self.character_animation_state = "idle_active"
+#                 else:
+#                     self.character_animation_state = "idle_passive"
+#                 self.character_animation_frame = settings.player_character_animation_idle_frame_count
+#         else:
+#             self.character_animation_frame -= 1
+#         
+        self.character_animation_rendered = self.font.render(self.character_animation_state, # + " " + str(self.character_animation_frame),
                                                              False,
                                                              self.color)
         self.character_animation_rect.update(self.character_animation_rendered.get_rect(center = self.character_animation_rect.center))
@@ -182,13 +188,53 @@ class Player:
                 new_top = to_deck.top
             from_deck.card_list[i].update_position(new_left, new_top)
                 
-    def take_damage(self, damage):
-        self.damage_rendered = self.font.render(str(-damage), False, self.color)
-        self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
+    def perform_attack(self, is_killing_blow):
+        if not is_killing_blow:
+            self.character_animation_state = "attack"
+            self.character_animation_frame = settings.player_character_animation_attack_frame_count
+        else:
+            self.perform_killing_blow()
         
+    def perform_riposte(self, is_killing_blow):
+        if not is_killing_blow:
+            self.character_animation_state = "riposte"
+            self.character_animation_frame = settings.player_character_animation_riposte_frame_count
+        else:
+            self.perform_killing_blow()
+        
+    def perform_killing_blow(self):
+        self.character_animation_state = "killing_blow"
+        self.character_animation_frame = settings.player_character_animation_killing_blow_frame_count
+                
+    def take_damage(self, damage, was_riposte):
         self.hp = max(0, self.hp - damage)
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
+        
+        if damage > 0:
+            self.damage_animation_clock = settings.player_damage_animation_length_in_ms
+            self.damage_rendered = self.font.render(str(-damage), False, self.color)
+            self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
+            
+            if self.hp > 0:
+                if was_riposte:
+                    self.character_animation_state = "riposte_pain"
+                    self.character_animation_frame = settings.player_character_animation_riposte_pain_frame_count
+                else:
+                    self.character_animation_state = "pain"
+                    self.character_animation_frame = settings.player_character_animation_pain_frame_count
+            else:
+                self.character_animation_state = "death"
+                self.character_animation_frame = settings.player_character_animation_death_frame_count
+        else:
+            if was_riposte:
+                self.character_animation_state = "riposte_blocked"
+                self.character_animation_frame = settings.player_character_animation_riposte_blocked_frame_count
+            else:
+                self.character_animation_state = "blocked"
+                self.character_animation_frame = settings.player_character_animation_blocked_frame_count
+        
+        
         
     def is_slide_animation_finished(self, from_deck, to_deck, n_cards_to_slide):
         num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
@@ -257,18 +303,31 @@ class Player:
                     self.listening_to_inputs = True
             elif self.is_my_turn:
                 self.listening_to_inputs = True
+                
+    def update_character(self, is_leading_player):
+        if self.character_animation_frame == 0:
+            if not (self.character_animation_state == "death" or self.character_animation_state == "killing_blow"):
+                if is_leading_player:
+                    self.character_animation_state = "idle_active"
+                else:
+                    self.character_animation_state = "idle_passive"
+                self.character_animation_frame = settings.player_character_animation_idle_frame_count
+        else:
+            self.character_animation_frame -= 1
         
-    def update(self):
+    def update(self, is_leading_player):
         self.update_todo_list()
+        self.update_character(is_leading_player)
         
         if self.listening_to_inputs:
             self.listen_to_card_played()
         else:
-            if self.todo_clear_play_area:
-                self.clear_play_area()
-            elif self.todo_replenish_draw_deck:
-                self.replenish_draw_deck()
-            elif self.todo_draw_a_card_to_hand:
-                self.draw_a_card_to_hand()
+            if self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive":
+                if self.todo_clear_play_area:
+                    self.clear_play_area()
+                elif self.todo_replenish_draw_deck:
+                    self.replenish_draw_deck()
+                elif self.todo_draw_a_card_to_hand:
+                    self.draw_a_card_to_hand()
         
             

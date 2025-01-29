@@ -43,7 +43,9 @@ class Game:
     # Update game state
     def check_game_over_condition(self):
         a_player_died = self.player_1.hp <= 0 or self.player_2.hp <= 0
-        return a_player_died or pg.mouse.get_pressed()[2]
+        final_animations_finished = self.player_1.character_animation_frame == 0 and self.player_2.character_animation_frame == 0
+        
+        return a_player_died and final_animations_finished and pg.mouse.get_pressed()[0]
     
     def determine_damage_and_next_leader(self, leading_card, following_card):
         if leading_card.suit == following_card.suit:
@@ -70,29 +72,25 @@ class Game:
             if damage_and_next_lead[1]:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                if damage_and_next_lead[0] > 0:
-                    self.player_2.take_damage(damage_and_next_lead[0])
-                    self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                self.player_1.perform_attack(self.player_2.hp <= damage_and_next_lead[0])
+                self.player_2.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                if damage_and_next_lead[0] > 0:
-                    self.player_1.take_damage(damage_and_next_lead[0])
-                    self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                self.player_2.perform_riposte(self.player_1.hp <= damage_and_next_lead[0])
+                self.player_1.take_damage(damage_and_next_lead[0], True)
                 self.is_player_1_leading = not self.is_player_1_leading
         else:
             if not damage_and_next_lead[1]:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                if damage_and_next_lead[0] > 0:
-                    self.player_1.take_damage(damage_and_next_lead[0])
-                    self.player_1.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                self.player_2.perform_attack(self.player_1.hp <= damage_and_next_lead[0])
+                self.player_1.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                if damage_and_next_lead[0] > 0:
-                    self.player_2.take_damage(damage_and_next_lead[0])
-                    self.player_2.damage_animation_clock = settings.player_damage_animation_length_in_ms
+                self.player_1.perform_riposte(self.player_2.hp <= damage_and_next_lead[0])
+                self.player_2.take_damage(damage_and_next_lead[0], True)
                 self.is_player_1_leading = not self.is_player_1_leading            
     
     def update_game_state(self):
@@ -111,8 +109,8 @@ class Game:
                 self.resolve_trick()
                 self.trick_resolved = True
 
-            self.player_1.update()
-            self.player_2.update()
+            self.player_1.update(self.is_player_1_leading)
+            self.player_2.update(not self.is_player_1_leading)
                 
             if (self.is_player_1_leading and self.player_1.listening_to_inputs) or (not self.is_player_1_leading and self.player_2.listening_to_inputs):
                 self.trick_resolved = False
