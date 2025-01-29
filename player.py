@@ -30,6 +30,11 @@ class Player:
         self.played_card = False
         self.is_my_turn = False
         
+        self.character_animation_state = "idle"
+        self.character_animation_frame = 0
+        self.character_animation_rendered = self.font.render(self.character_animation_state + " " + str(self.character_animation_frame), False, self.color)
+        self.character_animation_rect = self.set_character_animation_rect()
+        
         self.draw_deck = self.create_draw_deck(card_list, self.is_left_player)
         self.hand = self.create_hand(self.is_left_player)
         self.discard_pile = self.create_discard_pile(self.is_left_player)
@@ -41,6 +46,14 @@ class Player:
             hp_rect_center_left = settings.screen_width - hp_rect_center_left
         return self.hp_rendered.get_rect(center = (hp_rect_center_left,
                                                    int(settings.player_hp_rect_center_ratio.y * settings.screen_height)))
+    
+    def set_character_animation_rect(self):
+        if self.is_left_player:
+            character_animation_rect_x = settings.player_left_character_animation_center_x
+        else:
+            character_animation_rect_x = settings.player_right_character_animation_center_x
+        character_animation_rect_y = settings.player_character_animation_center_y
+        return self.character_animation_rendered.get_rect(center = (character_animation_rect_x, character_animation_rect_y))
 
     def create_draw_deck(self, card_list, is_left_player):
         if is_left_player:
@@ -111,11 +124,24 @@ class Player:
                                 (self.damage_rect.width, self.damage_rect.height))
         self.game.program.screen.blit(self.damage_rendered, self.damage_rect)
         
-    def draw(self):
+    def display_character(self):
+        if self.character_animation_frame == 0:
+            self.character_animation_state = "idle"
+            self.character_animation_frame = settings.player_character_animation_idle_frame_count
+        else:
+            self.character_animation_frame -= 1
+        self.character_animation_rendered = self.font.render(self.character_animation_state + " " + str(self.character_animation_frame),
+                                                             False,
+                                                             self.color)
+        self.character_animation_rect.update(self.character_animation_rendered.get_rect(center = self.character_animation_rect.center))
+        self.game.program.screen.blit(self.character_animation_rendered, self.character_animation_rect)
+        
+    def display(self):
         self.draw_deck.draw()
         self.hand.draw()
         self.discard_pile.draw()
         self.play_area.draw()
+        self.display_character()
         self.display_hp()
         if self.damage_animation_clock > 0:
             self.damage_animation_clock -= self.game.delta_time

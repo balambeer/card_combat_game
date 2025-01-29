@@ -138,7 +138,7 @@ class Game:
     def draw(self):
         pg.display.flip()
         self.draw_background()
-        self.player_1.draw()
-        self.player_2.draw()
+        self.player_1.display()
+        self.player_2.display()
 
         

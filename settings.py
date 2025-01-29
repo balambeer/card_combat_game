@@ -52,8 +52,12 @@ player_right_draw_deck_left = screen_width - player_deck_margin - card_width
 player_draw_deck_top = screen_height - player_deck_margin - card_height
 player_discard_pile_top = player_deck_margin
 player_left_hand_left = player_left_draw_deck_left + card_width + player_hand_and_draw_deck_buffer
-# figure out the 2.5 magic 
 player_right_hand_left = player_right_draw_deck_left - player_hand_and_draw_deck_buffer - int((1 + deck_face_up_shift * (player_hand_size - 1)) * card_width)
+
+player_left_character_animation_center_x = int(0.25 * screen_width)
+player_right_character_animation_center_x = int(0.75 * screen_width)
+player_character_animation_center_y = int(0.5 * screen_height)
+player_character_animation_idle_frame_count = 10
 
 player_hp_size_ratio = 0.1
 player_hp_size = int(player_hp_size_ratio * screen_height)
