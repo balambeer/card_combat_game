@@ -15,14 +15,14 @@ Gameplay ideas
 Implementation steps
 --------------------
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
-- readability: animate trick resolution
-- battle over screen (enough if we just freeze, or let the damage animation play out).
+- readability: animate trick resolution (mark leading card?, mark winning card?)
+- battle over screen (once final animation is done, print sg like "left click to exit" on the screen?).
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu
-- handle whos players turn it is (done but maybe can be done better?)
+- enable face-down hand
 - enable playing against computer
 
 Current stuff
 -------------
-- Animate trick resolution & damage...
+- Enable face-down hand...

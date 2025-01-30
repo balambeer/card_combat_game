@@ -33,9 +33,9 @@ card_value_size = int(card_value_size_ratio * card_height)
 card_suit_dimensions = support.XY(int(card_suit_size * card_width), int(card_suit_size * card_height))
 
 ### Deck
-deck_face_up_shift = 0.5
-deck_face_down_shift = 0.05
-deck_face_down_draw_card_skip = 3
+deck_not_pile_shift = 0.5
+deck_pile_shift = 0.05
+deck_pile_draw_card_skip = 3
 
 ### Battle
 battle_sky_proportion = 0.6
@@ -52,7 +52,7 @@ player_right_draw_deck_left = screen_width - player_deck_margin - card_width
 player_draw_deck_top = screen_height - player_deck_margin - card_height
 player_discard_pile_top = player_deck_margin
 player_left_hand_left = player_left_draw_deck_left + card_width + player_hand_and_draw_deck_buffer
-player_right_hand_left = player_right_draw_deck_left - player_hand_and_draw_deck_buffer - int((1 + deck_face_up_shift * (player_hand_size - 1)) * card_width)
+player_right_hand_left = player_right_draw_deck_left - player_hand_and_draw_deck_buffer - int((1 + deck_not_pile_shift * (player_hand_size - 1)) * card_width)
 
 player_left_character_animation_center_x = int(0.25 * screen_width)
 player_right_character_animation_center_x = int(0.75 * screen_width)

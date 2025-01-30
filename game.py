@@ -29,6 +29,7 @@ class Game:
                                             (1, "clubs"), (2, "clubs"), (3, "clubs"),
                                             (1, "diamonds"), (2, "diamonds"), (3, "diamonds"),
                                             ],
+                               show_hand = True,
                                color = "cornflowerblue")
         self.player_2 = Player(game = self,
                                is_left_player = False,
@@ -38,6 +39,7 @@ class Game:
                                             # (1, "clubs"), (2, "clubs"), (3, "clubs"),
                                             (1, "diamonds"), (2, "diamonds"), (3, "diamonds"),
                                             ],
+                               show_hand = False,
                                color = "tomato")
         
     # Update game state

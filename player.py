@@ -8,6 +8,7 @@ class Player:
                  is_left_player,
                  hp,
                  card_list,
+                 show_hand,
                  color):
         self.game = game
 
@@ -37,7 +38,7 @@ class Player:
         self.character_animation_rect = self.set_character_animation_rect()
         
         self.draw_deck = self.create_draw_deck(card_list, self.is_left_player)
-        self.hand = self.create_hand(self.is_left_player)
+        self.hand = self.create_hand(self.is_left_player, show_hand)
         self.discard_pile = self.create_discard_pile(self.is_left_player)
         self.play_area = self.create_play_area(self.is_left_player)
         
@@ -66,7 +67,8 @@ class Player:
                     card_list = [],
                     left = left,
                     top = top,
-                    face_up = False)
+                    face_up = False,
+                    is_pile = True)
         for card_params in card_list:
             card = Card(game = self.game,
                         value = card_params[0],
@@ -91,7 +93,8 @@ class Player:
                     card_list = [],
                     left = left,
                     top = top,
-                    face_up = True)
+                    face_up = True,
+                    is_pile = False)
         
     def create_discard_pile(self, is_left_player):
         if is_left_player:
@@ -103,9 +106,10 @@ class Player:
                     card_list = [],
                     left = left,
                     top = top,
-                    face_up = False)
+                    face_up = False,
+                    is_pile = True)
     
-    def create_hand(self, is_left_player):
+    def create_hand(self, is_left_player, show_hand):
         if is_left_player:
             left = settings.player_left_hand_left
         else:
@@ -115,7 +119,8 @@ class Player:
                     card_list = [],
                     left = left,
                     top = top,
-                    face_up = True)
+                    face_up = show_hand,
+                    is_pile = False)
     
     def display_hp(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
