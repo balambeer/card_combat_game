@@ -1,11 +1,13 @@
 import pygame as pg
 import settings
+import ai
 from card import *
 from deck import *
 
 class Player:
     def __init__(self, game,
                  is_left_player,
+                 is_human_controlled,
                  hp,
                  card_list,
                  show_hand,
@@ -13,23 +15,21 @@ class Player:
         self.game = game
 
         self.is_left_player = is_left_player
+        self.is_human_controlled = is_human_controlled
+        self.ai_timer = settings.player_ai_delay
+        
         self.color = color
         self.hp = hp
         self.font = pg.font.Font(None, settings.player_hp_size)
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         
-        self.todo_clear_play_area = False
-        self.todo_replenish_draw_deck = False
-        self.todo_draw_a_card_to_hand = False
+        self.state = "clean_up"
+        self.todo = "nothing"
         
         self.damage_animation_clock = 0
         self.damage_rendered = self.font.render(str(0), False, self.color)
         self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
-        
-        self.listening_to_inputs = False
-        self.played_card = False
-        self.is_my_turn = False
         
         self.character_animation_state = "idle"
         self.character_animation_frame = 0
@@ -131,16 +131,6 @@ class Player:
         self.game.program.screen.blit(self.damage_rendered, self.damage_rect)
         
     def display_character(self):
-#         if self.character_animation_frame == 0:
-#             if not (self.character_animation_state == "death" or self.character_animation_state == "killing_blow"):
-#                 if is_leading_player:
-#                     self.character_animation_state = "idle_active"
-#                 else:
-#                     self.character_animation_state = "idle_passive"
-#                 self.character_animation_frame = settings.player_character_animation_idle_frame_count
-#         else:
-#             self.character_animation_frame -= 1
-#         
         self.character_animation_rendered = self.font.render(self.character_animation_state, # + " " + str(self.character_animation_frame),
                                                              False,
                                                              self.color)
@@ -171,27 +161,25 @@ class Player:
                     self.hand.remove_card(card)
                     
                     self.play_area.add_card(card)
-                    self.listening_to_inputs = False
-                    self.played_card = True
+                    self.state = "played_card"
                 else:
                     self.hand.active_card_index = None
                     self.hand.selected_card_index = None
                     self.hand.set_card_positions()
                     self.hand.set_deck_rect()
       
-    def slide_cards(self, from_deck, to_deck, n_cards_to_slide, slide_time_in_ms):
-        n_steps = (slide_time_in_ms / 1000) * settings.fps
-        v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
-                       int((to_deck.top - from_deck.top) / n_steps))
-        num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
-        for i in range(num_cards_to_slide):
-            new_left = from_deck.card_list[i].left + v.x
-            new_top = from_deck.card_list[i].top + v.y
-            if (new_left - to_deck.left) * (from_deck.left - to_deck.left) <= 0:
-                new_left = to_deck.left
-            if (new_top - to_deck.top) * (from_deck.top - to_deck.top) <= 0:
-                new_top = to_deck.top
-            from_deck.card_list[i].update_position(new_left, new_top)
+    def listen_to_ai_input(self):
+        if self.ai_timer <= 0:
+            card_to_play_index = ai.select_random(len(self.hand.card_list))
+            card = self.hand.card_list[card_to_play_index]
+            
+            self.hand.remove_card(card)
+            self.play_area.add_card(card)
+            
+            self.state = "played_card"
+            self.ai_timer = settings.player_ai_delay
+        else:
+            self.ai_timer -= self.game.delta_time
                 
     def perform_attack(self, is_killing_blow):
         if not is_killing_blow:
@@ -239,7 +227,19 @@ class Player:
                 self.character_animation_state = "blocked"
                 self.character_animation_frame = settings.player_character_animation_blocked_frame_count
         
-        
+    def slide_cards(self, from_deck, to_deck, n_cards_to_slide, slide_time_in_ms):
+        n_steps = (slide_time_in_ms / 1000) * settings.fps
+        v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
+                       int((to_deck.top - from_deck.top) / n_steps))
+        num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
+        for i in range(num_cards_to_slide):
+            new_left = from_deck.card_list[i].left + v.x
+            new_top = from_deck.card_list[i].top + v.y
+            if (new_left - to_deck.left) * (from_deck.left - to_deck.left) <= 0:
+                new_left = to_deck.left
+            if (new_top - to_deck.top) * (from_deck.top - to_deck.top) <= 0:
+                new_top = to_deck.top
+            from_deck.card_list[i].update_position(new_left, new_top)
         
     def is_slide_animation_finished(self, from_deck, to_deck, n_cards_to_slide):
         num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
@@ -258,8 +258,6 @@ class Player:
                 self.play_area.remove_card(card)
                 self.discard_pile.add_card(card)
             self.todo_clear_play_area = False
-            self.played_card = False
-            self.is_my_turn = False
             
     def replenish_draw_deck(self):
         self.slide_cards(from_deck = self.discard_pile,
@@ -289,25 +287,27 @@ class Player:
             card = self.draw_deck.card_list.pop()
             self.draw_deck.set_card_positions()
             self.draw_deck.set_deck_rect()
-            card.face_up = True
-            card.draggable = True
+            if self.hand.face_up:
+                card.face_up = True
+            if self.is_human_controlled:
+                card.draggable = True
             self.hand.add_card(card)
             self.todo_draw_a_card_to_hand = False
         
     def update_todo_list(self):
-        if self.game.trick_resolved and self.played_card:
-            self.todo_clear_play_area = True
-            self.listening_to_inputs = False
-        else:
-            if len(self.hand.card_list) < settings.player_hand_size and not self.played_card:
+        if self.state == "clean_up":
+            if not self.play_area.is_empty():
+                self.todo = "clear_play_area"
+            elif len(self.hand.card_list) < settings.player_hand_size:
                 if not self.draw_deck.is_empty():
-                    self.todo_draw_a_card_to_hand = True
+                    self.todo = "draw_a_card_to_hand"
                 elif not self.discard_pile.is_empty():
-                    self.todo_replenish_draw_deck = True
-                elif self.is_my_turn:
-                    self.listening_to_inputs = True
-            elif self.is_my_turn:
-                self.listening_to_inputs = True
+                    self.todo = "replenish_draw_deck"
+            else:
+                self.todo = "nothing"
+                
+            if self.todo == "nothing":
+                self.state = "waiting"
                 
     def update_character(self, is_leading_player):
         if self.character_animation_frame == 0:
@@ -321,18 +321,25 @@ class Player:
             self.character_animation_frame -= 1
         
     def update(self, is_leading_player):
-        self.update_todo_list()
         self.update_character(is_leading_player)
+        if not (self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive"):
+            self.state = "animating"
         
-        if self.listening_to_inputs:
-            self.listen_to_card_played()
-        else:
+        if self.state == "my_turn":
+            if self.is_human_controlled:
+                self.listen_to_card_played()
+            else:
+                self.listen_to_ai_input()
+        elif self.state == "animating":
             if self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive":
-                if self.todo_clear_play_area:
-                    self.clear_play_area()
-                elif self.todo_replenish_draw_deck:
-                    self.replenish_draw_deck()
-                elif self.todo_draw_a_card_to_hand:
-                    self.draw_a_card_to_hand()
+                self.state = "clean_up"
+        elif self.state == "clean_up":
+            self.update_todo_list()
+            if self.todo == "clear_play_area":
+                self.clear_play_area()
+            elif self.todo == "replenish_draw_deck":
+                self.replenish_draw_deck()
+            elif self.todo == "draw_a_card_to_hand":
+                self.draw_a_card_to_hand()
         
             

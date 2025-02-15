@@ -23,6 +23,7 @@ class Game:
 
         self.player_1 = Player(game = self,
                                is_left_player = True,
+                               is_human_controlled = True,
                                hp = 10,
                                card_list = [(1, "spades"), (2, "spades"), (3, "spades"),
                                             # (1, "hearts"), (2, "hearts"), (3, "hearts"),
@@ -33,6 +34,7 @@ class Game:
                                color = "cornflowerblue")
         self.player_2 = Player(game = self,
                                is_left_player = False,
+                               is_human_controlled = False,
                                hp = 10,
                                card_list = [(1, "spades"), (2, "spades"), (3, "spades"),
                                             (1, "hearts"), (2, "hearts"), (3, "hearts"),
@@ -101,21 +103,21 @@ class Game:
             self.game_over = True
         else:
             self.delta_time = self.clock.tick(settings.fps)
-            # update game objects
-            if (self.is_player_1_leading and not self.player_1.played_card) or (not self.is_player_1_leading and self.player_2.played_card):
-                self.player_1.is_my_turn = True
-            if (not self.is_player_1_leading and not self.player_2.played_card) or (self.is_player_1_leading and self.player_1.played_card):
-                self.player_2.is_my_turn = True
-            
-            if self.player_1.played_card and self.player_2.played_card and not self.trick_resolved:
+            # manage players
+            if self.player_1.state == "waiting" and self.player_2.state == "waiting":
+                if self.is_player_1_leading:
+                    self.player_1.state = "my_turn"
+                else:
+                    self.player_2.state = "my_turn"
+            elif self.player_1.state == "waiting" and self.player_2.state == "played_card":
+                self.player_1.state = "my_turn"
+            elif self.player_1.state == "played_card" and self.player_2.state == "waiting":
+                self.player_2.state = "my_turn"
+            elif self.player_1.state == "played_card" and self.player_2.state == "played_card":
                 self.resolve_trick()
-                self.trick_resolved = True
 
             self.player_1.update(self.is_player_1_leading)
             self.player_2.update(not self.is_player_1_leading)
-                
-            if (self.is_player_1_leading and self.player_1.listening_to_inputs) or (not self.is_player_1_leading and self.player_2.listening_to_inputs):
-                self.trick_resolved = False
             
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         

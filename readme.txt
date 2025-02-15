@@ -20,9 +20,7 @@ Implementation steps
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu
-- enable face-down hand
-- enable playing against computer
 
 Current stuff
 -------------
-- Enable face-down hand...
+- Review playing against computer...

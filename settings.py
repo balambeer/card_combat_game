@@ -42,6 +42,8 @@ battle_sky_proportion = 0.6
 battle_sky_height = int(battle_sky_proportion * screen_height)
 
 ### Player
+player_ai_delay = 1000
+
 player_deck_margin_ratio = 0.05
 player_deck_margin = int(player_deck_margin_ratio * screen_width)
 player_hand_size = 3
