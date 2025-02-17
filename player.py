@@ -1,6 +1,7 @@
 import pygame as pg
 import settings
 import ai
+import math
 from card import *
 from deck import *
 
@@ -17,6 +18,7 @@ class Player:
         self.is_left_player = is_left_player
         self.is_human_controlled = is_human_controlled
         self.ai_timer = settings.player_ai_delay
+        self.ai_card_index = None
         
         self.color = color
         self.hp = hp
@@ -170,14 +172,22 @@ class Player:
       
     def listen_to_ai_input(self):
         if self.ai_timer <= 0:
-            card_to_play_index = ai.select_random(len(self.hand.card_list))
-            card = self.hand.card_list[card_to_play_index]
-            
-            self.hand.remove_card(card)
-            self.play_area.add_card(card)
-            
-            self.state = "played_card"
-            self.ai_timer = settings.player_ai_delay
+            if self.ai_card_index is None:
+                self.ai_card_index = ai.select_random(len(self.hand.card_list))
+            self.slide_cards(from_deck = self.hand,
+                             to_deck = self.play_area,
+                             card_indexes = [self.ai_card_index],
+                             slide_v_per_ms = settings.animation_card_slide_v_per_ms)
+            if self.is_slide_animation_finished(from_deck = self.hand,
+                                                to_deck = self.play_area,
+                                                card_indexes = [self.ai_card_index]):
+                card = self.hand.card_list[self.ai_card_index]
+                self.hand.remove_card(card)
+                self.play_area.add_card(card)
+                
+                self.state = "played_card"
+                self.ai_timer = settings.player_ai_delay
+                self.ai_card_index = None
         else:
             self.ai_timer -= self.game.delta_time
                 
@@ -227,12 +237,12 @@ class Player:
                 self.character_animation_state = "blocked"
                 self.character_animation_frame = settings.player_character_animation_blocked_frame_count
         
-    def slide_cards(self, from_deck, to_deck, n_cards_to_slide, slide_time_in_ms):
-        n_steps = (slide_time_in_ms / 1000) * settings.fps
+    def slide_cards(self, from_deck, to_deck, card_indexes, slide_v_per_ms):
+        d = math.sqrt((to_deck.left - from_deck.left) ** 2 + (to_deck.top - from_deck.top) ** 2)
+        n_steps = d / (slide_v_per_ms * 1000 / settings.fps)
         v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
                        int((to_deck.top - from_deck.top) / n_steps))
-        num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
-        for i in range(num_cards_to_slide):
+        for i in card_indexes:
             new_left = from_deck.card_list[i].left + v.x
             new_top = from_deck.card_list[i].top + v.y
             if (new_left - to_deck.left) * (from_deck.left - to_deck.left) <= 0:
@@ -241,18 +251,18 @@ class Player:
                 new_top = to_deck.top
             from_deck.card_list[i].update_position(new_left, new_top)
         
-    def is_slide_animation_finished(self, from_deck, to_deck, n_cards_to_slide):
-        num_cards_to_slide = min(n_cards_to_slide, len(from_deck.card_list))
-        return from_deck.card_list[num_cards_to_slide - 1].left == to_deck.left and from_deck.card_list[num_cards_to_slide - 1].top == to_deck.top
+    def is_slide_animation_finished(self, from_deck, to_deck, card_indexes):
+        last_card_index = max(card_indexes)
+        return from_deck.card_list[last_card_index].left == to_deck.left and from_deck.card_list[last_card_index].top == to_deck.top
             
     def clear_play_area(self):
         self.slide_cards(from_deck = self.play_area,
                          to_deck = self.discard_pile,
-                         n_cards_to_slide = 1,
-                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+                         card_indexes = [0],
+                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.play_area,
                                   to_deck = self.discard_pile,
-                                  n_cards_to_slide = 1):
+                                  card_indexes = [0]):
             for card in self.play_area.card_list:
                 card.flip()
                 self.play_area.remove_card(card)
@@ -262,11 +272,11 @@ class Player:
     def replenish_draw_deck(self):
         self.slide_cards(from_deck = self.discard_pile,
                          to_deck = self.draw_deck,
-                         n_cards_to_slide = len(self.discard_pile.card_list),
-                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+                         card_indexes = range(len(self.discard_pile.card_list)),
+                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.discard_pile,
                                             to_deck = self.draw_deck,
-                                            n_cards_to_slide = len(self.discard_pile.card_list)):
+                                            card_indexes = range(len(self.discard_pile.card_list))):
             for i in range(len(self.discard_pile.card_list)):
                 self.draw_deck.add_card(self.discard_pile.card_list.pop())
             self.draw_deck.shuffle()
@@ -279,11 +289,11 @@ class Player:
     def draw_a_card_to_hand(self):
         self.slide_cards(from_deck = self.draw_deck,
                          to_deck = self.hand,
-                         n_cards_to_slide = 1,
-                         slide_time_in_ms = settings.animation_card_slide_time_in_ms)
+                         card_indexes = [0],
+                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.draw_deck,
                                             to_deck = self.hand,
-                                            n_cards_to_slide = 1):
+                                            card_indexes = [0]):
             card = self.draw_deck.card_list.pop()
             self.draw_deck.set_card_positions()
             self.draw_deck.set_deck_rect()
