@@ -25,10 +25,10 @@ class Game:
                                is_left_player = True,
                                is_human_controlled = True,
                                hp = 10,
-                               card_list = [(1, "spades"), (2, "spades"), (3, "spades"),
-                                            # (1, "hearts"), (2, "hearts"), (3, "hearts"),
-                                            (1, "clubs"), (2, "clubs"), (3, "clubs"),
-                                            (1, "diamonds"), (2, "diamonds"), (3, "diamonds"),
+                               card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                            # (1, "mana"), (2, "mana"), (3, "mana"),
+                                            (1, "shield"), (2, "shield"), (3, "shield"),
+                                            (1, "trump"), (2, "trump"), (3, "trump"),
                                             ],
                                show_hand = True,
                                color = "cornflowerblue")
@@ -36,10 +36,10 @@ class Game:
                                is_left_player = False,
                                is_human_controlled = False,
                                hp = 10,
-                               card_list = [(1, "spades"), (2, "spades"), (3, "spades"),
-                                            (1, "hearts"), (2, "hearts"), (3, "hearts"),
-                                            # (1, "clubs"), (2, "clubs"), (3, "clubs"),
-                                            (1, "diamonds"), (2, "diamonds"), (3, "diamonds"),
+                               card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                            (1, "mana"), (2, "mana"), (3, "mana"),
+                                            # (1, "shield"), (2, "shield"), (3, "shield"),
+                                            (1, "trump"), (2, "trump"), (3, "trump"),
                                             ],
                                show_hand = False,
                                color = "tomato")
@@ -58,7 +58,7 @@ class Game:
             else:
                 return (0, not self.is_player_1_leading)
         else:
-            if following_card.suit == "diamonds":
+            if following_card.suit == "trump":
                 return (following_card.value, not self.is_player_1_leading)
             else:
                 return (leading_card.value, self.is_player_1_leading)

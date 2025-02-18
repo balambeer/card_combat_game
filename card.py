@@ -39,10 +39,14 @@ class Card():
         self.pressed_pos = support.XY(self.left, self.top)
         
     def set_card_color(self):
-        if self.suit == "spades" or self.suit == "clubs":
+        if self.suit == "spear":
+            return "steelblue"
+        elif self.suit == "shield":
+            return "mediumseagreen"
+        elif self.suit == "mana":
+            return "plum"
+        elif self.suit == "trump":
             return "black"
-        elif self.suit == "hearts" or self.suit == "diamonds":
-            return "red"
         
     def convert_value_to_numeric(self):
         if self.value == "A":
@@ -56,29 +60,38 @@ class Card():
         elif self.value >= 2 and self.value <= 10:
             return self.value
         
-    def draw_spades(self, topleft):
+    def draw_spear(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
                         points = [(topleft.x, topleft.y + settings.card_suit_dimensions.y),
                                   (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y),
                                   (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y)])
         
-    def draw_clubs(self, topleft):
-        pg.draw.polygon(surface = self.game.program.screen,
-                        color = self.color,
-                        points = [(topleft.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y)])
-    
-    def draw_hearts(self, topleft):
+    # This looks a little wonky
+    def draw_shield(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
                         points = [(topleft.x, topleft.y),
                                   (topleft.x + settings.card_suit_dimensions.x, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y)])
+                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
+                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y),
+                                  (topleft.x, topleft.y + settings.card_suit_dimensions.y // 2)])
+    
+    # This looks a little wonky...
+    def draw_mana(self, topleft):
+        pg.draw.polygon(surface = self.game.program.screen,
+                        color = self.color,
+                        points = [(topleft.x + settings.card_suit_dimensions.x // 2, topleft.y),
+                                  (topleft.x + settings.card_suit_dimensions.x * 2 // 3, topleft.y + settings.card_suit_dimensions.y // 3),
+                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
+                                  (topleft.x + settings.card_suit_dimensions.x * 2 // 3, topleft.y + settings.card_suit_dimensions.y * 2 // 3),
+                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y),
+                                  (topleft.x + settings.card_suit_dimensions.x // 3, topleft.y + settings.card_suit_dimensions.y * 2 // 3),
+                                  (topleft.x, topleft.y + settings.card_suit_dimensions.y // 2),
+                                  (topleft.x + settings.card_suit_dimensions.x // 3, topleft.y + settings.card_suit_dimensions.y // 3)
+                                  ])
         
-    def draw_diamonds(self, topleft):
+    def draw_trump(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
                         points = [(topleft.x, topleft.y + settings.card_suit_dimensions.y // 2),
@@ -87,14 +100,14 @@ class Card():
                                   (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y)])
         
     def draw_suit(self, topleft):
-        if self.suit == "spades":
-            self.draw_spades(topleft)
-        elif self.suit == "hearts":
-            self.draw_hearts(topleft)
-        elif self.suit == "clubs":
-            self.draw_clubs(topleft)
-        elif self.suit == "diamonds":
-            self.draw_diamonds(topleft)
+        if self.suit == "spear":
+            self.draw_spear(topleft)
+        elif self.suit == "mana":
+            self.draw_mana(topleft)
+        elif self.suit == "shield":
+            self.draw_shield(topleft)
+        elif self.suit == "trump":
+            self.draw_trump(topleft)
         
     def highlight(self):
         if (self.clickable or self.draggable) and self.is_mouse_over():
@@ -110,7 +123,7 @@ class Card():
         
         # card sheet
         pg.draw.rect(surface = self.game.program.screen,
-                     color = "white",
+                     color = "antiquewhite",
                      rect = self.card_rect,
                      border_radius = settings.card_rounded_corner_size)
         pg.draw.rect(surface = self.game.program.screen,
