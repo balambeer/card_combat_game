@@ -39,7 +39,7 @@ def utility_when_following(card, opponent_card):
             if card.value > opponent_card.value:
                 value_utility = 1
             else:
-                value_utility = 0
+                value_utility = 3 - card.value
         else:
             suit_utility = -1
             value_utility = card.value
