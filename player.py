@@ -170,10 +170,11 @@ class Player:
                     self.hand.set_card_positions()
                     self.hand.set_deck_rect()
       
-    def listen_to_ai_input(self):
+    def listen_to_ai_input(self, opponent_card_played):
         if self.ai_timer <= 0:
             if self.ai_card_index is None:
-                self.ai_card_index = ai.select_random(len(self.hand.card_list))
+                # self.ai_card_index = ai.select_random(len(self.hand.card_list))
+                self.ai_card_index = ai.select_greedy(opponent_card_played, self.hand)
             self.slide_cards(from_deck = self.hand,
                              to_deck = self.play_area,
                              card_indexes = [self.ai_card_index],
@@ -330,7 +331,7 @@ class Player:
         else:
             self.character_animation_frame -= 1
         
-    def update(self, is_leading_player):
+    def update(self, is_leading_player, opponent_card_played):
         self.update_character(is_leading_player)
         if not (self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive"):
             self.state = "animating"
@@ -339,7 +340,7 @@ class Player:
             if self.is_human_controlled:
                 self.listen_to_card_played()
             else:
-                self.listen_to_ai_input()
+                self.listen_to_ai_input(opponent_card_played)
         elif self.state == "animating":
             if self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive":
                 self.state = "clean_up"

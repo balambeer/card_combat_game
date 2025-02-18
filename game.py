@@ -116,8 +116,16 @@ class Game:
             elif self.player_1.state == "played_card" and self.player_2.state == "played_card":
                 self.resolve_trick()
 
-            self.player_1.update(self.is_player_1_leading)
-            self.player_2.update(not self.is_player_1_leading)
+            if len(self.player_1.play_area.card_list) == 1:
+                player_1_card_played = self.player_1.play_area.card_list[0]
+            else:
+                player_1_card_played = None
+            if len(self.player_2.play_area.card_list) == 1:
+                player_2_card_played = self.player_2.play_area.card_list[0]
+            else:
+                player_2_card_played = None
+            self.player_1.update(self.is_player_1_leading, player_2_card_played)
+            self.player_2.update(not self.is_player_1_leading, player_1_card_played)
             
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         
