@@ -44,7 +44,7 @@ class Card():
         elif self.suit == "shield":
             return "mediumseagreen"
         elif self.suit == "mana":
-            return "plum"
+            return "mediumorchid"
         elif self.suit == "trump":
             return "black"
         
