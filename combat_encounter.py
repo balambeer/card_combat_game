@@ -1,11 +1,11 @@
 import pygame as pg
-import settings
+import constants
 import support
 from card import *
 from deck import *
 from player import *
 
-class Game:
+class CombatEncounter:
     # Constructor
     def __init__(self, program):
         self.program = program
@@ -102,7 +102,7 @@ class Game:
             self.program.menu.update_at_game_over()
             self.game_over = True
         else:
-            self.delta_time = self.clock.tick(settings.fps)
+            self.delta_time = self.clock.tick(constants.fps)
             # manage players
             if self.player_1.state == "waiting" and self.player_2.state == "waiting":
                 if self.is_player_1_leading:
@@ -133,11 +133,11 @@ class Game:
     def draw_background(self):
         pg.draw.rect(self.program.screen,
                      "lightskyblue1",
-                     pg.Rect(0, 0, settings.screen_width, settings.battle_sky_height))
+                     pg.Rect(0, 0, constants.screen_width, constants.battle_sky_height))
         pg.draw.rect(self.program.screen,
                      "olivedrab3",
-                     pg.Rect(0, settings.battle_sky_height,
-                             settings.screen_width, settings.screen_height - settings.battle_sky_height))
+                     pg.Rect(0, constants.battle_sky_height,
+                             constants.screen_width, constants.screen_height - constants.battle_sky_height))
         
     def draw(self):
         pg.display.flip()

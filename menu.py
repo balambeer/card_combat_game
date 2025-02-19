@@ -1,5 +1,5 @@
 import pygame as pg
-import settings
+import constants
 
 menu_background_color = "gray"
 menu_text_color = "black"
@@ -23,8 +23,8 @@ class Button():
         
         self.text = text
         self.text_rendered = self.program.font.render(text, False, self.idle_color)
-        self.text_rect = self.text_rendered.get_rect(center = (int(center_position[0] * settings.resolution[0]),
-                                                               int(center_position[1] * settings.resolution[1])))
+        self.text_rect = self.text_rendered.get_rect(center = (int(center_position[0] * constants.resolution[0]),
+                                                               int(center_position[1] * constants.resolution[1])))
         
         self.background_rect = self.text_rect.inflate(0.1 * self.text_rendered.get_width(),
                                                       0.1 * self.text_rendered.get_height())
@@ -71,7 +71,7 @@ class Menu():
         self.program = program
         
         self.game_title = self.program.font.render("Game Title", False, menu_text_color)
-        self.game_title_rect = self.game_title.get_rect(center = (0.5 * settings.screen_width, 0.2 * settings.screen_height))
+        self.game_title_rect = self.game_title.get_rect(center = (0.5 * constants.screen_width, 0.2 * constants.screen_height))
         
         self.new_game_button = ButtonNewGame(self.program)
         
@@ -83,7 +83,7 @@ class Menu():
         
     def update_at_game_over(self):
         pg.mouse.set_visible(True)
-        pg.mouse.set_pos((0.5 * settings.screen_width, 0.9 * settings.screen_height))
+        pg.mouse.set_pos((0.5 * constants.screen_width, 0.9 * constants.screen_height))
             
     def listen_to_inputs(self):
         self.new_game_button.listen()

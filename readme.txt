@@ -20,7 +20,8 @@ Implementation steps
 - juice: sound effects, camerea shake, particle effects etc...
 - rename settings to constants
 - add settings/options menu
+- add point-crawl and wrap the combat/exploration into that structure...
 
 Current stuff
 -------------
-- Review playing against computer...
+- Rename files & modules

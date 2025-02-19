@@ -1,6 +1,6 @@
 import pygame as pg
 import support
-import settings
+import constants
 
 class Card():
     def __init__(self, game,
@@ -15,11 +15,11 @@ class Card():
         self.left = 0
         self.top = 0
         self.card_rect = pg.Rect((self.left, self.top),
-                                 (settings.card_width, settings.card_height))
-        self.back_rect = pg.Rect((self.left + settings.card_back_border_width,
-                                  self.top + settings.card_back_border_width),
-                                 (settings.card_width - 2 * settings.card_back_border_width,
-                                  settings.card_height - 2 * settings.card_back_border_width))
+                                 (constants.card_width, constants.card_height))
+        self.back_rect = pg.Rect((self.left + constants.card_back_border_width,
+                                  self.top + constants.card_back_border_width),
+                                 (constants.card_width - 2 * constants.card_back_border_width,
+                                  constants.card_height - 2 * constants.card_back_border_width))
         
         self.value = value
         self.suit = suit
@@ -28,10 +28,10 @@ class Card():
         
         self.color = self.set_card_color()
         self.color_back = color_back
-        self.font = pg.font.Font(None, settings.card_value_size)
+        self.font = pg.font.Font(None, constants.card_value_size)
         self.value_rendered = self.font.render(str(self.value), False, self.color)
-        self.value_rect = self.value_rendered.get_rect(center = (int(self.left + settings.card_value_center.x * settings.card_width),
-                                                                 int(self.top + settings.card_value_center.y * settings.card_height)))
+        self.value_rect = self.value_rendered.get_rect(center = (int(self.left + constants.card_value_center.x * constants.card_width),
+                                                                 int(self.top + constants.card_value_center.y * constants.card_height)))
         
         self.clickable = clickable
         self.draggable = draggable
@@ -63,41 +63,41 @@ class Card():
     def draw_spear(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
-                        points = [(topleft.x, topleft.y + settings.card_suit_dimensions.y),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y)])
+                        points = [(topleft.x, topleft.y + constants.card_suit_dimensions.y),
+                                  (topleft.x + constants.card_suit_dimensions.x, topleft.y + constants.card_suit_dimensions.y),
+                                  (topleft.x + constants.card_suit_dimensions.x // 2, topleft.y)])
         
     # This looks a little wonky
     def draw_shield(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
                         points = [(topleft.x, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y),
-                                  (topleft.x, topleft.y + settings.card_suit_dimensions.y // 2)])
+                                  (topleft.x + constants.card_suit_dimensions.x, topleft.y),
+                                  (topleft.x + constants.card_suit_dimensions.x, topleft.y + constants.card_suit_dimensions.y // 2),
+                                  (topleft.x + constants.card_suit_dimensions.x // 2, topleft.y + constants.card_suit_dimensions.y),
+                                  (topleft.x, topleft.y + constants.card_suit_dimensions.y // 2)])
     
     # This looks a little wonky...
     def draw_mana(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
-                        points = [(topleft.x + settings.card_suit_dimensions.x // 2, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x * 2 // 3, topleft.y + settings.card_suit_dimensions.y // 3),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x * 2 // 3, topleft.y + settings.card_suit_dimensions.y * 2 // 3),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y),
-                                  (topleft.x + settings.card_suit_dimensions.x // 3, topleft.y + settings.card_suit_dimensions.y * 2 // 3),
-                                  (topleft.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 3, topleft.y + settings.card_suit_dimensions.y // 3)
+                        points = [(topleft.x + constants.card_suit_dimensions.x // 2, topleft.y),
+                                  (topleft.x + constants.card_suit_dimensions.x * 2 // 3, topleft.y + constants.card_suit_dimensions.y // 3),
+                                  (topleft.x + constants.card_suit_dimensions.x, topleft.y + constants.card_suit_dimensions.y // 2),
+                                  (topleft.x + constants.card_suit_dimensions.x * 2 // 3, topleft.y + constants.card_suit_dimensions.y * 2 // 3),
+                                  (topleft.x + constants.card_suit_dimensions.x // 2, topleft.y + constants.card_suit_dimensions.y),
+                                  (topleft.x + constants.card_suit_dimensions.x // 3, topleft.y + constants.card_suit_dimensions.y * 2 // 3),
+                                  (topleft.x, topleft.y + constants.card_suit_dimensions.y // 2),
+                                  (topleft.x + constants.card_suit_dimensions.x // 3, topleft.y + constants.card_suit_dimensions.y // 3)
                                   ])
         
     def draw_trump(self, topleft):
         pg.draw.polygon(surface = self.game.program.screen,
                         color = self.color,
-                        points = [(topleft.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y),
-                                  (topleft.x + settings.card_suit_dimensions.x, topleft.y + settings.card_suit_dimensions.y // 2),
-                                  (topleft.x + settings.card_suit_dimensions.x // 2, topleft.y + settings.card_suit_dimensions.y)])
+                        points = [(topleft.x, topleft.y + constants.card_suit_dimensions.y // 2),
+                                  (topleft.x + constants.card_suit_dimensions.x // 2, topleft.y),
+                                  (topleft.x + constants.card_suit_dimensions.x, topleft.y + constants.card_suit_dimensions.y // 2),
+                                  (topleft.x + constants.card_suit_dimensions.x // 2, topleft.y + constants.card_suit_dimensions.y)])
         
     def draw_suit(self, topleft):
         if self.suit == "spear":
@@ -115,7 +115,7 @@ class Card():
                      color = "orange",
                      rect = self.card_rect,
                      width = 2,
-                     border_radius = settings.card_rounded_corner_size)
+                     border_radius = constants.card_rounded_corner_size)
         
     def draw(self):
 #         left = int(self.center_position.x - self.width / 2)
@@ -125,20 +125,20 @@ class Card():
         pg.draw.rect(surface = self.game.program.screen,
                      color = "antiquewhite",
                      rect = self.card_rect,
-                     border_radius = settings.card_rounded_corner_size)
+                     border_radius = constants.card_rounded_corner_size)
         pg.draw.rect(surface = self.game.program.screen,
                      color = "black",
                      rect = self.card_rect,
                      width = 1,
-                     border_radius = settings.card_rounded_corner_size)
+                     border_radius = constants.card_rounded_corner_size)
         
         if self.face_up:
             # value
             self.game.program.screen.blit(self.value_rendered, self.value_rect)
             
             # suit
-            suit_topleft = support.XY(int(self.left + (settings.card_suit_center.x - settings.card_suit_size / 2) * settings.card_width),
-                                      int(self.top + (settings.card_suit_center.y - settings.card_suit_size / 2) * settings.card_height))
+            suit_topleft = support.XY(int(self.left + (constants.card_suit_center.x - constants.card_suit_size / 2) * constants.card_width),
+                                      int(self.top + (constants.card_suit_center.y - constants.card_suit_size / 2) * constants.card_height))
             self.draw_suit(suit_topleft)
         else:
             pg.draw.rect(surface = self.game.program.screen,
@@ -169,13 +169,13 @@ class Card():
         self.left = left
         self.top = top
         self.card_rect.update((self.left, self.top),
-                                 (int(settings.card_width), int(settings.card_height)))
-        self.back_rect.update((self.left + settings.card_back_border_width,
-                                  self.top + settings.card_back_border_width),
-                                 (settings.card_width - 2 * settings.card_back_border_width,
-                                  settings.card_height - 2 * settings.card_back_border_width))
-        self.value_rect.update(self.value_rendered.get_rect(center = (int(self.left + settings.card_value_center.x * settings.card_width),
-                                                                      int(self.top + settings.card_value_center.y * settings.card_height))))
+                                 (int(constants.card_width), int(constants.card_height)))
+        self.back_rect.update((self.left + constants.card_back_border_width,
+                                  self.top + constants.card_back_border_width),
+                                 (constants.card_width - 2 * constants.card_back_border_width,
+                                  constants.card_height - 2 * constants.card_back_border_width))
+        self.value_rect.update(self.value_rendered.get_rect(center = (int(self.left + constants.card_value_center.x * constants.card_width),
+                                                                      int(self.top + constants.card_value_center.y * constants.card_height))))
     
     def flip(self):
         self.face_up = not self.face_up

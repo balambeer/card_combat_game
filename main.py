@@ -1,17 +1,17 @@
 import sys
 import pygame as pg
-import settings
+import constants
 from menu import *
-from game import *
+from combat_encounter import *
 
 class Program:
     def __init__(self):
         pg.init()
-        self.screen = pg.display.set_mode(settings.resolution)
-        self.font = pg.font.Font(None, settings.menu_font_size)
+        self.screen = pg.display.set_mode(constants.resolution)
+        self.font = pg.font.Font(None, constants.menu_font_size)
         
         self.menu = Menu(self)
-        self.game = Game(self)
+        self.game = CombatEncounter(self)
         
     # Check events
     def check_for_quit(self, event):

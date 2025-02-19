@@ -1,5 +1,5 @@
 import pygame as pg
-import settings
+import constants
 import ai
 import math
 from card import *
@@ -17,12 +17,12 @@ class Player:
 
         self.is_left_player = is_left_player
         self.is_human_controlled = is_human_controlled
-        self.ai_timer = settings.player_ai_delay
+        self.ai_timer = constants.player_ai_delay
         self.ai_card_index = None
         
         self.color = color
         self.hp = hp
-        self.font = pg.font.Font(None, settings.player_hp_size)
+        self.font = pg.font.Font(None, constants.player_hp_size)
         self.hp_rendered = self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         
@@ -45,26 +45,26 @@ class Player:
         self.play_area = self.create_play_area(self.is_left_player)
         
     def set_hp_rect(self, is_left_player):
-        hp_rect_center_left = int(settings.player_hp_rect_center_ratio.x * settings.screen_width)
+        hp_rect_center_left = int(constants.player_hp_rect_center_ratio.x * constants.screen_width)
         if not is_left_player:
-            hp_rect_center_left = settings.screen_width - hp_rect_center_left
+            hp_rect_center_left = constants.screen_width - hp_rect_center_left
         return self.hp_rendered.get_rect(center = (hp_rect_center_left,
-                                                   int(settings.player_hp_rect_center_ratio.y * settings.screen_height)))
+                                                   int(constants.player_hp_rect_center_ratio.y * constants.screen_height)))
     
     def set_character_animation_rect(self):
         if self.is_left_player:
-            character_animation_rect_x = settings.player_left_character_animation_center_x
+            character_animation_rect_x = constants.player_left_character_animation_center_x
         else:
-            character_animation_rect_x = settings.player_right_character_animation_center_x
-        character_animation_rect_y = settings.player_character_animation_center_y
+            character_animation_rect_x = constants.player_right_character_animation_center_x
+        character_animation_rect_y = constants.player_character_animation_center_y
         return self.character_animation_rendered.get_rect(center = (character_animation_rect_x, character_animation_rect_y))
 
     def create_draw_deck(self, card_list, is_left_player):
         if is_left_player:
-            left = settings.player_left_draw_deck_left
+            left = constants.player_left_draw_deck_left
         else:
-            left = settings.player_right_draw_deck_left
-        top = settings.player_draw_deck_top
+            left = constants.player_right_draw_deck_left
+        top = constants.player_draw_deck_top
         deck = Deck(game = self.game,
                     card_list = [],
                     left = left,
@@ -87,10 +87,10 @@ class Player:
 
     def create_play_area(self, is_left_player):
         if is_left_player:
-            left = settings.screen_half_width - settings.card_width
+            left = constants.screen_half_width - constants.card_width
         else:
-            left = settings.screen_half_width
-        top = settings.player_draw_deck_top
+            left = constants.screen_half_width
+        top = constants.player_draw_deck_top
         return Deck(game = self.game,
                     card_list = [],
                     left = left,
@@ -100,10 +100,10 @@ class Player:
         
     def create_discard_pile(self, is_left_player):
         if is_left_player:
-            left = settings.player_left_draw_deck_left
+            left = constants.player_left_draw_deck_left
         else:
-            left = settings.player_right_draw_deck_left
-        top = settings.player_discard_pile_top
+            left = constants.player_right_draw_deck_left
+        top = constants.player_discard_pile_top
         return Deck(game = self.game,
                     card_list = [],
                     left = left,
@@ -113,10 +113,10 @@ class Player:
     
     def create_hand(self, is_left_player, show_hand):
         if is_left_player:
-            left = settings.player_left_hand_left
+            left = constants.player_left_hand_left
         else:
-            left = settings.player_right_hand_left
-        top = settings.player_draw_deck_top
+            left = constants.player_right_hand_left
+        top = constants.player_draw_deck_top
         return Deck(game = self.game,
                     card_list = [],
                     left = left,
@@ -128,7 +128,7 @@ class Player:
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
         
     def display_damage(self):
-        self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - settings.player_damage_drift_v * self.game.delta_time),
+        self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - constants.player_damage_drift_v * self.game.delta_time),
                                 (self.damage_rect.width, self.damage_rect.height))
         self.game.program.screen.blit(self.damage_rendered, self.damage_rect)
         
@@ -178,7 +178,7 @@ class Player:
             self.slide_cards(from_deck = self.hand,
                              to_deck = self.play_area,
                              card_indexes = [self.ai_card_index],
-                             slide_v_per_ms = settings.animation_card_slide_v_per_ms)
+                             slide_v_per_ms = constants.animation_card_slide_v_per_ms)
             if self.is_slide_animation_finished(from_deck = self.hand,
                                                 to_deck = self.play_area,
                                                 card_indexes = [self.ai_card_index]):
@@ -187,7 +187,7 @@ class Player:
                 self.play_area.add_card(card)
                 
                 self.state = "played_card"
-                self.ai_timer = settings.player_ai_delay
+                self.ai_timer = constants.player_ai_delay
                 self.ai_card_index = None
         else:
             self.ai_timer -= self.game.delta_time
@@ -195,20 +195,20 @@ class Player:
     def perform_attack(self, is_killing_blow):
         if not is_killing_blow:
             self.character_animation_state = "attack"
-            self.character_animation_frame = settings.player_character_animation_attack_frame_count
+            self.character_animation_frame = constants.player_character_animation_attack_frame_count
         else:
             self.perform_killing_blow()
         
     def perform_riposte(self, is_killing_blow):
         if not is_killing_blow:
             self.character_animation_state = "riposte"
-            self.character_animation_frame = settings.player_character_animation_riposte_frame_count
+            self.character_animation_frame = constants.player_character_animation_riposte_frame_count
         else:
             self.perform_killing_blow()
         
     def perform_killing_blow(self):
         self.character_animation_state = "killing_blow"
-        self.character_animation_frame = settings.player_character_animation_killing_blow_frame_count
+        self.character_animation_frame = constants.player_character_animation_killing_blow_frame_count
                 
     def take_damage(self, damage, was_riposte):
         self.hp = max(0, self.hp - damage)
@@ -216,31 +216,31 @@ class Player:
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         
         if damage > 0:
-            self.damage_animation_clock = settings.player_damage_animation_length_in_ms
+            self.damage_animation_clock = constants.player_damage_animation_length_in_ms
             self.damage_rendered = self.font.render(str(-damage), False, self.color)
             self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
             
             if self.hp > 0:
                 if was_riposte:
                     self.character_animation_state = "riposte_pain"
-                    self.character_animation_frame = settings.player_character_animation_riposte_pain_frame_count
+                    self.character_animation_frame = constants.player_character_animation_riposte_pain_frame_count
                 else:
                     self.character_animation_state = "pain"
-                    self.character_animation_frame = settings.player_character_animation_pain_frame_count
+                    self.character_animation_frame = constants.player_character_animation_pain_frame_count
             else:
                 self.character_animation_state = "death"
-                self.character_animation_frame = settings.player_character_animation_death_frame_count
+                self.character_animation_frame = constants.player_character_animation_death_frame_count
         else:
             if was_riposte:
                 self.character_animation_state = "riposte_blocked"
-                self.character_animation_frame = settings.player_character_animation_riposte_blocked_frame_count
+                self.character_animation_frame = constants.player_character_animation_riposte_blocked_frame_count
             else:
                 self.character_animation_state = "blocked"
-                self.character_animation_frame = settings.player_character_animation_blocked_frame_count
+                self.character_animation_frame = constants.player_character_animation_blocked_frame_count
         
     def slide_cards(self, from_deck, to_deck, card_indexes, slide_v_per_ms):
         d = math.sqrt((to_deck.left - from_deck.left) ** 2 + (to_deck.top - from_deck.top) ** 2)
-        n_steps = d / (slide_v_per_ms * 1000 / settings.fps)
+        n_steps = d / (slide_v_per_ms * 1000 / constants.fps)
         v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
                        int((to_deck.top - from_deck.top) / n_steps))
         for i in card_indexes:
@@ -260,7 +260,7 @@ class Player:
         self.slide_cards(from_deck = self.play_area,
                          to_deck = self.discard_pile,
                          card_indexes = [0],
-                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
+                         slide_v_per_ms = constants.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.play_area,
                                   to_deck = self.discard_pile,
                                   card_indexes = [0]):
@@ -274,7 +274,7 @@ class Player:
         self.slide_cards(from_deck = self.discard_pile,
                          to_deck = self.draw_deck,
                          card_indexes = range(len(self.discard_pile.card_list)),
-                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
+                         slide_v_per_ms = constants.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.discard_pile,
                                             to_deck = self.draw_deck,
                                             card_indexes = range(len(self.discard_pile.card_list))):
@@ -291,7 +291,7 @@ class Player:
         self.slide_cards(from_deck = self.draw_deck,
                          to_deck = self.hand,
                          card_indexes = [0],
-                         slide_v_per_ms = settings.animation_card_slide_v_per_ms)
+                         slide_v_per_ms = constants.animation_card_slide_v_per_ms)
         if self.is_slide_animation_finished(from_deck = self.draw_deck,
                                             to_deck = self.hand,
                                             card_indexes = [0]):
@@ -309,7 +309,7 @@ class Player:
         if self.state == "clean_up":
             if not self.play_area.is_empty():
                 self.todo = "clear_play_area"
-            elif len(self.hand.card_list) < settings.player_hand_size:
+            elif len(self.hand.card_list) < constants.player_hand_size:
                 if not self.draw_deck.is_empty():
                     self.todo = "draw_a_card_to_hand"
                 elif not self.discard_pile.is_empty():
@@ -327,7 +327,7 @@ class Player:
                     self.character_animation_state = "idle_active"
                 else:
                     self.character_animation_state = "idle_passive"
-                self.character_animation_frame = settings.player_character_animation_idle_frame_count
+                self.character_animation_frame = constants.player_character_animation_idle_frame_count
         else:
             self.character_animation_frame -= 1
         

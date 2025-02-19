@@ -1,7 +1,7 @@
 import pygame as pg
 import random
 from card import *
-import settings
+import constants
 import support
 
 class Deck:
@@ -33,27 +33,27 @@ class Deck:
         if not self.is_pile:
             self.n_cards_to_display = len(self.card_list)
         else:
-            self.n_cards_to_display = (len(self.card_list) + settings.deck_pile_draw_card_skip - 1) // settings.deck_pile_draw_card_skip
+            self.n_cards_to_display = (len(self.card_list) + constants.deck_pile_draw_card_skip - 1) // constants.deck_pile_draw_card_skip
         
     def set_deck_rect(self):
         self.set_n_cards_to_display()
         if not self.is_pile:
             self.deck_rect = pg.Rect((self.left, self.top),
-                                     (max(0, self.n_cards_to_display - 1) * settings.deck_not_pile_shift * settings.card_width + settings.card_width,
-                                      settings.card_height))
+                                     (max(0, self.n_cards_to_display - 1) * constants.deck_not_pile_shift * constants.card_width + constants.card_width,
+                                      constants.card_height))
         else:
-            self.deck_rect = pg.Rect((self.left, self.top - max(0, self.n_cards_to_display - 1) * settings.deck_pile_shift * settings.card_width),
-                                     (max(0, self.n_cards_to_display - 1) * settings.deck_pile_shift * settings.card_width + settings.card_width,
-                                      max(0, self.n_cards_to_display - 1) * settings.deck_pile_shift * settings.card_width + settings.card_height))
+            self.deck_rect = pg.Rect((self.left, self.top - max(0, self.n_cards_to_display - 1) * constants.deck_pile_shift * constants.card_width),
+                                     (max(0, self.n_cards_to_display - 1) * constants.deck_pile_shift * constants.card_width + constants.card_width,
+                                      max(0, self.n_cards_to_display - 1) * constants.deck_pile_shift * constants.card_width + constants.card_height))
     
     def set_card_positions(self):
         for i in range(len(self.card_list)):
             if not self.is_pile:
-                self.card_list[i].update_position(self.left + int(i * settings.deck_not_pile_shift * settings.card_width),
+                self.card_list[i].update_position(self.left + int(i * constants.deck_not_pile_shift * constants.card_width),
                                                   self.top)
             else:
-                self.card_list[i].update_position(self.left + int(i * settings.deck_pile_shift * settings.card_width),
-                                                  self.top - int(i * settings.deck_pile_shift * settings.card_width))
+                self.card_list[i].update_position(self.left + int(i * constants.deck_pile_shift * constants.card_width),
+                                                  self.top - int(i * constants.deck_pile_shift * constants.card_width))
         
     def draw(self):
         pg.draw.rect(surface = self.game.program.screen,
