@@ -2,7 +2,7 @@ import sys
 import pygame as pg
 import constants
 from menu import *
-from combat_encounter import *
+from game import *
 
 class Program:
     def __init__(self):
@@ -11,7 +11,9 @@ class Program:
         self.font = pg.font.Font(None, constants.menu_font_size)
         
         self.menu = Menu(self)
-        self.game = CombatEncounter(self)
+        self.game = None
+        
+        self.state = "menu"
         
     # Check events
     def check_for_quit(self, event):
@@ -27,10 +29,13 @@ class Program:
     def run(self):
         while True:
             self.check_events()
-            if not self.game.game_over:
-                self.game.update_game_state()
+            if self.state == "game":
+                self.game.update()
                 self.game.draw()
-            else:              
+                if self.game.state == "game_over":
+                    self.state = "menu"
+                    self.game = None
+            elif self.state == "menu":              
                 self.menu.draw()
                 self.menu.listen_to_inputs()
             

@@ -10,17 +10,16 @@ class CombatEncounter:
     def __init__(self, program):
         self.program = program
         
-        self.game_over = True
-        self.game_over_frames = 0
+        self.state = "ongoing"
         
-    def new_game(self):
-        self.game_over = False
+        # TODO: need to move this up to the Game object
         self.clock = pg.time.Clock()
         self.delta_time = 0
         
         self.is_player_1_leading = True
         self.trick_resolved = False
 
+        # TODO: these things should be passed...
         self.player_1 = Player(game = self,
                                is_left_player = True,
                                is_human_controlled = True,
@@ -45,7 +44,7 @@ class CombatEncounter:
                                color = "tomato")
         
     # Update game state
-    def check_game_over_condition(self):
+    def check_combat_over_condition(self):
         a_player_died = self.player_1.hp <= 0 or self.player_2.hp <= 0
         final_animations_finished = self.player_1.character_animation_frame == 0 and self.player_2.character_animation_frame == 0
         
@@ -97,10 +96,10 @@ class CombatEncounter:
                 self.player_2.take_damage(damage_and_next_lead[0], True)
                 self.is_player_1_leading = not self.is_player_1_leading            
     
-    def update_game_state(self):
-        if self.check_game_over_condition():
-            self.program.menu.update_at_game_over()
-            self.game_over = True
+    # def update_game_state(self):
+    def update(self):
+        if self.check_combat_over_condition():
+            self.state = "combat_over"
         else:
             self.delta_time = self.clock.tick(constants.fps)
             # manage players
@@ -140,7 +139,6 @@ class CombatEncounter:
                              constants.screen_width, constants.screen_height - constants.battle_sky_height))
         
     def draw(self):
-        pg.display.flip()
         self.draw_background()
         self.player_1.display()
         self.player_2.display()

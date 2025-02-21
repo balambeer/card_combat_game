@@ -24,4 +24,4 @@ Implementation steps
 
 Current stuff
 -------------
-- Rename files & modules
+- Make PointCrawl class

@@ -1,5 +1,6 @@
 import pygame as pg
 import constants
+from game import *
 
 menu_background_color = "gray"
 menu_text_color = "black"
@@ -64,7 +65,8 @@ class ButtonNewGame(Button):
         
     def listen(self):
         if self.is_left_clicked():
-            self.program.game.new_game()
+            self.program.game = Game(self.program)
+            self.program.state = "game"
         
 class Menu():
     def __init__(self, program):
@@ -81,6 +83,7 @@ class Menu():
         self.program.screen.blit(self.game_title, self.game_title_rect)
         self.new_game_button.draw()
         
+    # Not needed now (mouse is visible in-game as well)
     def update_at_game_over(self):
         pg.mouse.set_visible(True)
         pg.mouse.set_pos((0.5 * constants.screen_width, 0.9 * constants.screen_height))
