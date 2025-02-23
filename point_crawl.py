@@ -69,7 +69,6 @@ class PointCrawl:
             self.pressed_node_index = None
         
     def draw(self):
-        pg.display.flip()
         self.program.screen.fill(point_crawl_background_color)
         
         # edges
