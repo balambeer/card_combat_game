@@ -14,10 +14,12 @@ point_crawl_player_size = int(0.75 * point_crawl_node_size) // 2
 
 class GraphNode():
     # constructor
-    def __init__(self, index, position):
+    def __init__(self, index, position, encounter_type, encounter_index):
         self.rect = pg.Rect((position.x - point_crawl_node_size // 2,
                              position.y - point_crawl_node_size // 2),
                             (point_crawl_node_size, point_crawl_node_size))
+        self.encounter_type = encounter_type
+        self.encounter_index = encounter_index
 
 class Graph():
     # constructor
@@ -32,8 +34,7 @@ class PointCrawl:
                  player_start_node_index):
         self.program = program
         
-        self.graph = Graph(nodes = [GraphNode(0, support.XY(50, 50)), GraphNode(1, support.XY(400, 200))],
-                           edges = [(0, 1)])
+        self.graph = graph
         
         self.player_node_index = player_start_node_index
         self.active_node_index = None
@@ -62,10 +63,10 @@ class PointCrawl:
                     self.active_node_index = i
                     if pg.mouse.get_pressed()[0]:
                         self.pressed_node_index = i
-            
-        if not self.pressed_node_index is None:
-            self.state = "next_node_selected"
-            self.player_node_index = self.pressed_node_index
+                        self.player_node_index = self.pressed_node_index
+                        self.state = "next_node_selected"
+        elif not self.pressed_node_index is None:
+            self.state = "waiting_for_input"
             self.pressed_node_index = None
         
     def draw(self):

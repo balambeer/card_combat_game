@@ -16,11 +16,16 @@ Implementation steps
 --------------------
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
 - readability: animate trick resolution (mark leading card?, mark winning card?)
-- battle over screen (once final animation is done, print sg like "left click to exit" on the screen?).
 - juice: sound effects, camerea shake, particle effects etc...
-- rename settings to constants
-- add settings/options menu
-- add point-crawl and wrap the combat/exploration into that structure...
+
+Systems:
+- separate hp & stress (regenerates vs doesn't regenerate between combats)
+- rewards after combat
+- multiple character classes, skills/items
+- keywords to exploration encounter
+- settings/options menu + rules description
+- animate point-crawl
+- build vertical slice demo
 
 Current stuff
 -------------
