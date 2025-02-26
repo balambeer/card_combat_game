@@ -3,130 +3,108 @@ import constants
 import support
 from card import *
 from deck import *
-from player import *
+from fighter import *
 
 class CombatEncounter:
     # Constructor
-    def __init__(self, program):
+    def __init__(self, program,
+                 player,
+                 enemy):
         self.program = program
         
         self.state = "ongoing"
         
-        # TODO: need to move this up to the Game object
-        self.clock = pg.time.Clock()
-        self.delta_time = 0
-        
-        self.is_player_1_leading = True
+        self.is_fighter_1_leading = True
         self.trick_resolved = False
 
         # TODO: these things should be passed...
-        self.player_1 = Player(game = self,
-                               is_left_player = True,
-                               is_human_controlled = True,
-                               hp = 10,
-                               card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                            # (1, "mana"), (2, "mana"), (3, "mana"),
-                                            (1, "shield"), (2, "shield"), (3, "shield"),
-                                            (1, "trump"), (2, "trump"), (3, "trump"),
-                                            ],
-                               show_hand = True,
-                               color = "cornflowerblue")
-        self.player_2 = Player(game = self,
-                               is_left_player = False,
-                               is_human_controlled = False,
-                               hp = 10,
-                               card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                            (1, "mana"), (2, "mana"), (3, "mana"),
-                                            # (1, "shield"), (2, "shield"), (3, "shield"),
-                                            (1, "trump"), (2, "trump"), (3, "trump"),
-                                            ],
-                               show_hand = False,
-                               color = "tomato")
+        self.fighter_1 = player
+        self.fighter_2 = enemy
         
     # Update game state
     def check_combat_over_condition(self):
-        a_player_died = self.player_1.hp <= 0 or self.player_2.hp <= 0
-        final_animations_finished = self.player_1.character_animation_frame == 0 and self.player_2.character_animation_frame == 0
+        a_player_died = self.fighter_1.hp <= 0 or self.fighter_2.hp <= 0
+        final_animations_finished = self.fighter_1.character_animation_frame == 0 and self.fighter_2.character_animation_frame == 0
         
         return a_player_died and final_animations_finished and pg.mouse.get_pressed()[0]
     
     def determine_damage_and_next_leader(self, leading_card, following_card):
         if leading_card.suit == following_card.suit:
             if leading_card.value > following_card.value:
-                return (0, self.is_player_1_leading)
+                return (0, self.is_fighter_1_leading)
             else:
-                return (0, not self.is_player_1_leading)
+                return (0, not self.is_fighter_1_leading)
         else:
             if following_card.suit == "trump":
-                return (following_card.value, not self.is_player_1_leading)
+                return (following_card.value, not self.is_fighter_1_leading)
             else:
-                return (leading_card.value, self.is_player_1_leading)
+                return (leading_card.value, self.is_fighter_1_leading)
     
     def resolve_trick(self):
         print("Trick Resolution:")
-        if self.is_player_1_leading:
-            damage_and_next_lead = self.determine_damage_and_next_leader(self.player_1.play_area.card_list[0],
-                                                                         self.player_2.play_area.card_list[0])
+        if self.is_fighter_1_leading:
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.fighter_1.play_area.card_list[0],
+                                                                         self.fighter_2.play_area.card_list[0])
         else:
-            damage_and_next_lead = self.determine_damage_and_next_leader(self.player_2.play_area.card_list[0],
-                                                                         self.player_1.play_area.card_list[0])
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.fighter_2.play_area.card_list[0],
+                                                                         self.fighter_1.play_area.card_list[0])
                   
-        if self.is_player_1_leading:
+        if self.is_fighter_1_leading:
             if damage_and_next_lead[1]:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.player_1.perform_attack(self.player_2.hp <= damage_and_next_lead[0])
-                self.player_2.take_damage(damage_and_next_lead[0], False)
+                self.fighter_1.perform_attack(self.fighter_2.hp <= damage_and_next_lead[0])
+                self.fighter_2.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.player_2.perform_riposte(self.player_1.hp <= damage_and_next_lead[0])
-                self.player_1.take_damage(damage_and_next_lead[0], True)
-                self.is_player_1_leading = not self.is_player_1_leading
+                self.fighter_2.perform_riposte(self.fighter_1.hp <= damage_and_next_lead[0])
+                self.fighter_1.take_damage(damage_and_next_lead[0], True)
+                self.is_fighter_1_leading = not self.is_fighter_1_leading
         else:
             if not damage_and_next_lead[1]:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.player_2.perform_attack(self.player_1.hp <= damage_and_next_lead[0])
-                self.player_1.take_damage(damage_and_next_lead[0], False)
+                self.fighter_2.perform_attack(self.fighter_1.hp <= damage_and_next_lead[0])
+                self.fighter_1.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.player_1.perform_riposte(self.player_2.hp <= damage_and_next_lead[0])
-                self.player_2.take_damage(damage_and_next_lead[0], True)
-                self.is_player_1_leading = not self.is_player_1_leading            
+                self.fighter_1.perform_riposte(self.fighter_2.hp <= damage_and_next_lead[0])
+                self.fighter_2.take_damage(damage_and_next_lead[0], True)
+                self.is_fighter_1_leading = not self.is_fighter_1_leading            
     
     # def update_game_state(self):
     def update(self):
         if self.check_combat_over_condition():
             self.state = "combat_over"
         else:
-            self.delta_time = self.clock.tick(constants.fps)
+            self.program.game.delta_time = self.program.game.clock.tick(constants.fps)
             # manage players
-            if self.player_1.state == "waiting" and self.player_2.state == "waiting":
-                if self.is_player_1_leading:
-                    self.player_1.state = "my_turn"
+            if self.fighter_1.state == "waiting" and self.fighter_2.state == "waiting":
+                if self.is_fighter_1_leading:
+                    self.fighter_1.state = "my_turn"
                 else:
-                    self.player_2.state = "my_turn"
-            elif self.player_1.state == "waiting" and self.player_2.state == "played_card":
-                self.player_1.state = "my_turn"
-            elif self.player_1.state == "played_card" and self.player_2.state == "waiting":
-                self.player_2.state = "my_turn"
-            elif self.player_1.state == "played_card" and self.player_2.state == "played_card":
+                    self.fighter_2.state = "my_turn"
+            elif self.fighter_1.state == "waiting" and self.fighter_2.state == "played_card":
+                self.fighter_1.state = "my_turn"
+            elif self.fighter_1.state == "played_card" and self.fighter_2.state == "waiting":
+                self.fighter_2.state = "my_turn"
+            elif self.fighter_1.state == "played_card" and self.fighter_2.state == "played_card":
                 self.resolve_trick()
 
-            if len(self.player_1.play_area.card_list) == 1:
-                player_1_card_played = self.player_1.play_area.card_list[0]
+            if len(self.fighter_1.play_area.card_list) == 1:
+                fighter_1_card_played = self.fighter_1.play_area.card_list[0]
             else:
-                player_1_card_played = None
-            if len(self.player_2.play_area.card_list) == 1:
-                player_2_card_played = self.player_2.play_area.card_list[0]
+                fighter_1_card_played = None
+            if len(self.fighter_2.play_area.card_list) == 1:
+                fighter_2_card_played = self.fighter_2.play_area.card_list[0]
             else:
-                player_2_card_played = None
-            self.player_1.update(self.is_player_1_leading, player_2_card_played)
-            self.player_2.update(not self.is_player_1_leading, player_1_card_played)
+                fighter_2_card_played = None
+            self.fighter_1.update(self.is_fighter_1_leading, fighter_2_card_played)
+            self.fighter_2.update(not self.is_fighter_1_leading, fighter_1_card_played)
             
-        pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
+        pg.display.set_caption(f'{self.program.game.clock.get_fps(): .1f}')
         
     # Update screen
     def draw_background(self):
@@ -140,7 +118,7 @@ class CombatEncounter:
         
     def draw(self):
         self.draw_background()
-        self.player_1.display()
-        self.player_2.display()
+        self.fighter_1.display()
+        self.fighter_2.display()
 
         

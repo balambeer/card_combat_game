@@ -1,5 +1,6 @@
 import pygame as pg
 import constants
+from player import *
 from point_crawl import *
 from combat_encounter import *
 from exploration_encounter import *
@@ -9,11 +10,21 @@ class Game:
     def __init__(self, program):
         self.program = program
         
+        self.clock = pg.time.Clock()
+        self.delta_time = 0
+        
         # This will live elsewhere in the future
         graph = Graph(nodes = [GraphNode(0, support.XY(50, 50), "exploration", 0),
                                GraphNode(1, support.XY(350, 200), "combat", 1)],
                       edges = [(0,1)])
         
+        self.player = Player(program = self.program,
+                             hp = 10,
+                             card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                          # (1, "mana"), (2, "mana"), (3, "mana"),
+                                          (1, "shield"), (2, "shield"), (3, "shield"),
+                                          (1, "trump"), (2, "trump"), (3, "trump")],
+                             skill_list = [])
         self.point_crawl = PointCrawl(program,
                                       graph,
                                       0)
@@ -34,7 +45,26 @@ class Game:
                 # additional node-dependent inputs?
                 selected_node = self.point_crawl.graph.nodes[self.point_crawl.pressed_node_index]
                 if selected_node.encounter_type == "combat":
-                    self.encounter = CombatEncounter(self.program)
+                    player_fighter = Fighter(game = self,
+                                             is_left_player = True,
+                                             is_human_controlled = True,
+                                             hp = self.player.hp,
+                                             card_list = self.player.card_list,
+                                             show_hand = True,
+                                             color = "cornflowerblue")
+                    enemy_fighter = Fighter(game = self,
+                                            is_left_player = False,
+                                            is_human_controlled = False,
+                                            hp = 10,
+                                            card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                                         (1, "mana"), (2, "mana"), (3, "mana"),
+                                                         # (1, "shield"), (2, "shield"), (3, "shield"),
+                                                         (1, "trump"), (2, "trump"), (3, "trump")],
+                                            show_hand = False,
+                                            color = "tomato")
+                    self.encounter = CombatEncounter(self.program,
+                                                     player = player_fighter,
+                                                     enemy = enemy_fighter)
                     self.state = "combat_encounter"
                 elif selected_node.encounter_type == "exploration":
                     self.encounter = ExplorationEncounter(program = self.program,
@@ -49,7 +79,7 @@ class Game:
         elif self.state == "combat_encounter":
             self.encounter.update()
             if self.encounter.state == "combat_over":
-                if self.encounter.player_1.hp <= 0:
+                if self.encounter.fighter_1.hp <= 0:
                     self.state = "game_over"
                 else:
                     self.state = "point_crawl"
