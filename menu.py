@@ -15,7 +15,7 @@ class ButtonNewGame(Button):
                  background_color = menu_background_color,
                  idle_color = menu_button_idle_color,
                  active_color = menu_button_active_color):
-        super().__init__(program, center_position, text, background_color, idle_color, active_color)
+        super().__init__(program, center_position, program.font, text, background_color, idle_color, active_color)
         
     def listen(self):
         if self.is_left_clicked():

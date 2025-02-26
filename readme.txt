@@ -16,7 +16,7 @@ Implementation steps
 --------------------
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
 - readability: animate trick resolution (mark leading card?, mark winning card?)
-- juice: sound effects, camerea shake, particle effects etc...
+- juice: sound effects, music, camerea shake, particle effects etc...
 
 Systems:
 - separate hp & stress (regenerates vs doesn't regenerate between combats)
