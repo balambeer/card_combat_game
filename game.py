@@ -1,5 +1,6 @@
 import pygame as pg
 import constants
+import menu
 from player import *
 from point_crawl import *
 from combat_encounter import *
@@ -18,28 +19,51 @@ class Game:
                                GraphNode(1, support.XY(350, 200), "combat", 1)],
                       edges = [(0,1)])
         
-        self.player = Player(program = self.program,
-                             hp = 10,
-                             card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                          # (1, "mana"), (2, "mana"), (3, "mana"),
-                                          (1, "shield"), (2, "shield"), (3, "shield"),
-                                          (1, "trump"), (2, "trump"), (3, "trump")],
-                             skill_list = [])
+        self.player = None
+        
+        self.select_character = menu.SelectCharacter(program)
         self.point_crawl = PointCrawl(program,
                                       graph,
                                       0)
-        self.encounter = ExplorationEncounter(program = self.program,
-                                              encounter_text = "You set out to explore the ruins of Ithar.",
-                                              option_1_text = "Go through the gate",
-                                              option_2_text = "Turn back",
-                                              option_3_text = "Climb the wall",
-                                              resolution_options = ["You go through the gate.",
-                                                                    "You want to turn back but something compels you to go in.",
-                                                                    "You climb through the wall."])
-        self.state = "exploration_encounter"
+        self.encounter = None
+        self.state = "select_character"
         
     def update(self):
-        if self.state == "point_crawl":
+        if self.state == "select_character":
+            if self.select_character.heretic_button.is_left_clicked():
+                self.player = Player(program = self.program,
+                             hp = 10,
+                             card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                          (1, "shield"), (2, "shield"), (3, "shield"),
+                                          (1, "trump"), (2, "trump"), (3, "trump")],
+                             skill_list = [])
+            elif self.select_character.thief_button.is_left_clicked():
+                self.player = Player(program = self.program,
+                             hp = 10,
+                             card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                          (1, "mana"), (2, "mana"), (3, "mana"),
+                                          (1, "trump"), (2, "trump"), (3, "trump")],
+                             skill_list = [])
+            elif self.select_character.witch_button.is_left_clicked():
+                self.player = Player(program = self.program,
+                             hp = 10,
+                             card_list = [(1, "mana"), (2, "mana"), (3, "mana"),
+                                          (1, "shield"), (2, "shield"), (3, "shield"),
+                                          (1, "trump"), (2, "trump"), (3, "trump")],
+                             skill_list = [])
+                
+            if not self.player is None:
+                self.select_character = None
+                self.state = "exploration_encounter"
+                self.encounter = ExplorationEncounter(program = self.program,
+                                                          encounter_text = "You set out to explore the ruins of Ithar.",
+                                                          option_1_text = "Go through the gate",
+                                                          option_2_text = "Turn back",
+                                                          option_3_text = "Climb the wall",
+                                                          resolution_options = ["You go through the gate.",
+                                                                                "You want to turn back but something compels you to go in.",
+                                                                                "You climb through the wall."])
+        elif self.state == "point_crawl":
             self.point_crawl.update()
             if self.point_crawl.state == "next_node_selected":
                 # additional node-dependent inputs?
@@ -95,7 +119,9 @@ class Game:
                 
     def draw(self):
         pg.display.flip()
-        if self.state == "point_crawl":
+        if self.state == "select_character":
+            self.select_character.draw()
+        elif self.state == "point_crawl":
             self.point_crawl.draw()
         elif self.state == "combat_encounter":
             self.encounter.draw()

@@ -10,7 +10,7 @@ class Program:
         self.screen = pg.display.set_mode(constants.resolution)
         self.font = pg.font.Font(None, constants.menu_font_size)
         
-        self.menu = Menu(self)
+        self.menu = MainMenu(self)
         self.game = None
         
         self.state = "menu"
