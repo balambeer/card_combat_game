@@ -32,21 +32,24 @@ class Game:
         if self.state == "select_character":
             if self.select_character.heretic_button.is_left_clicked():
                 self.player = Player(program = self.program,
-                             hp = 10,
+                                     hp = 3,
+                                     max_stress = 7,
                              card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
                                           (1, "shield"), (2, "shield"), (3, "shield"),
                                           (1, "trump"), (2, "trump"), (3, "trump")],
                              skill_list = [])
             elif self.select_character.thief_button.is_left_clicked():
                 self.player = Player(program = self.program,
-                             hp = 10,
+                             hp = 3,
+                                     max_stress = 5,
                              card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
                                           (1, "mana"), (2, "mana"), (3, "mana"),
                                           (1, "trump"), (2, "trump"), (3, "trump")],
                              skill_list = [])
             elif self.select_character.witch_button.is_left_clicked():
                 self.player = Player(program = self.program,
-                             hp = 10,
+                             hp = 3,
+                                     max_stress = 5,
                              card_list = [(1, "mana"), (2, "mana"), (3, "mana"),
                                           (1, "shield"), (2, "shield"), (3, "shield"),
                                           (1, "trump"), (2, "trump"), (3, "trump")],
@@ -73,13 +76,15 @@ class Game:
                                              is_left_player = True,
                                              is_human_controlled = True,
                                              hp = self.player.hp,
+                                             max_stress = self.player.max_stress,
                                              card_list = self.player.card_list,
                                              show_hand = True,
                                              color = "cornflowerblue")
                     enemy_fighter = Fighter(game = self,
                                             is_left_player = False,
                                             is_human_controlled = False,
-                                            hp = 10,
+                                            hp = 3,
+                                            max_stress = 7,
                                             card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
                                                          (1, "mana"), (2, "mana"), (3, "mana"),
                                                          # (1, "shield"), (2, "shield"), (3, "shield"),
@@ -106,6 +111,7 @@ class Game:
                 if self.encounter.fighter_1.hp <= 0:
                     self.state = "game_over"
                 else:
+                    self.player.hp = self.encounter.fighter_1.hp
                     self.state = "point_crawl"
                     self.point_crawl.state = "waiting_for_input"
                 self.encounter = None

@@ -48,29 +48,29 @@ class CombatEncounter:
         else:
             damage_and_next_lead = self.determine_damage_and_next_leader(self.fighter_2.play_area.card_list[0],
                                                                          self.fighter_1.play_area.card_list[0])
-                  
+        
         if self.is_fighter_1_leading:
             if damage_and_next_lead[1]:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.fighter_1.perform_attack(self.fighter_2.hp <= damage_and_next_lead[0])
+                self.fighter_1.perform_attack(self.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
                 self.fighter_2.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.fighter_2.perform_riposte(self.fighter_1.hp <= damage_and_next_lead[0])
+                self.fighter_2.perform_riposte(self.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
                 self.fighter_1.take_damage(damage_and_next_lead[0], True)
                 self.is_fighter_1_leading = not self.is_fighter_1_leading
         else:
             if not damage_and_next_lead[1]:
                 print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 2 leads next")
-                self.fighter_2.perform_attack(self.fighter_1.hp <= damage_and_next_lead[0])
+                self.fighter_2.perform_attack(self.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
                 self.fighter_1.take_damage(damage_and_next_lead[0], False)
             else:
                 print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
                 print("    player 1 leads next")
-                self.fighter_1.perform_riposte(self.fighter_2.hp <= damage_and_next_lead[0])
+                self.fighter_1.perform_riposte(self.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
                 self.fighter_2.take_damage(damage_and_next_lead[0], True)
                 self.is_fighter_1_leading = not self.is_fighter_1_leading            
     

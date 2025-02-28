@@ -3,11 +3,13 @@ import pygame as pg
 class Player:
     def __init__(self, program,
                  hp,
+                 max_stress,
                  card_list,
                  skill_list):
         self.program = program
         
         self.hp = hp
+        self.max_stress = max_stress
         self.card_list = card_list
         self.skill_list = skill_list
        
