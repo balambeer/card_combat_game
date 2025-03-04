@@ -59,11 +59,11 @@ class Game:
                 self.select_character = None
                 self.state = "exploration_encounter"
                 self.encounter = ExplorationEncounter(program = self.program,
-                                                          encounter_text = "You set out to explore the ruins of Ithar.",
+                                                          encounter_text = "You set out to explore the ruins of Ithar. Some more text to force multiple lines. Even more and more and more... And some more even, maybe we can even get to three lines if we're lucky.",
                                                           option_1_text = "Go through the gate",
                                                           option_2_text = "Turn back",
                                                           option_3_text = "Climb the wall",
-                                                          resolution_options = ["You go through the gate.",
+                                                          resolution_options = ["You go through the gate. Let's try to force this to be in multiple lines as well. I'll write another sentence just to make sure that it goes to multiple lines. Should be enough now.",
                                                                                 "You want to turn back but something compels you to go in.",
                                                                                 "You climb through the wall."])
         elif self.state == "point_crawl":

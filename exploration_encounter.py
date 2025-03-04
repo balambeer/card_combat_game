@@ -39,12 +39,12 @@ class ExplorationEncounter:
         
         self.textbox_rect = pg.Rect((textbox_left, textbox_top),
                                     (textbox_width, textbox_height))
-        self.encounter_text_rendered = self.font.render(self.encounter_text, False, text_color)
-        self.encounter_text_rect = self.encounter_text_rendered.get_rect(topleft = (text_top, text_left))
+        self.encounter_text_rendered_list = self.render_text_to_multiple_lines(self.encounter_text)
+        self.encounter_text_rect_list = self.get_rendered_rects(self.encounter_text_rendered_list)
         
         self.option_1_button = Button(program = program,
                                       center_position = (0.5,
-                                                         (self.encounter_text_rect.bottom + 1.5 * font_size) / constants.screen_height),
+                                                         (self.encounter_text_rect_list[-1].bottom + 1.5 * font_size) / constants.screen_height),
                                       font = self.font,
                                       text = option_1_text,
                                       background_color = textbox_color,
@@ -71,6 +71,63 @@ class ExplorationEncounter:
         self.resolution_text = None
         self.continue_button = None
         
+    def render_next_line(self, remaining_text):
+        text_rendered = self.font.render(remaining_text, False, text_color)
+        text_rendered_rect = text_rendered.get_rect()
+        text_max_width = self.textbox_rect.width - 2 * text_margin
+        
+        if text_rendered_rect.width <= text_max_width:
+            return [text_rendered, None]
+        else:
+            remaining_words = remaining_text.split(sep = " ")
+            n_words = len(remaining_words)
+
+            n_words_to_include = min(n_words, int(n_words * (text_rendered_rect.width / text_max_width)))
+            text_to_render = " ".join(remaining_words[:n_words_to_include])
+            text_rendered = self.font.render(text_to_render, False, text_color)
+            text_rendered_rect = text_rendered.get_rect()
+            text_to_render_finalized = False
+            include_more_words = text_rendered_rect.width < text_max_width
+            
+            while not text_to_render_finalized:
+                if include_more_words:
+                    n_words_to_include += 1
+                else:
+                    n_words_to_include -= 1
+                text_to_render = " ".join(remaining_words[:n_words_to_include])
+                text_rendered = self.font.render(text_to_render, False, text_color)
+                text_rendered_rect = text_rendered.get_rect()
+                
+                if include_more_words:
+                    if text_rendered_rect.width > text_max_width or n_words_to_include == (n_words - 1):
+                        n_words_to_include -= 1
+                        text_to_render_finalized = True
+                else:
+                    if text_rendered_rect.width < text_max_width or n_words_to_include == 1:
+                        text_to_render_finalized = True
+                    
+            text_to_render = " ".join(remaining_words[:n_words_to_include])
+            text_rendered = self.font.render(text_to_render, False, text_color)
+            return [text_rendered, " ".join(remaining_words[n_words_to_include:])]
+                
+    def render_text_to_multiple_lines(self, text):
+        crap = self.render_next_line(text)
+        text_rendered_list = [crap[0]]
+        while not crap[1] is None:
+            crap = self.render_next_line(crap[1])
+            text_rendered_list.append(crap[0])
+        
+        return text_rendered_list
+    
+    def get_rendered_rects(self, rendered_text_list):
+        text_rect_list = [rendered_text_list[0].get_rect(topleft = (text_top, text_left))]
+        for i in range(len(rendered_text_list)):
+            if i > 0:
+                new_text_rect = rendered_text_list[i].get_rect(topleft = text_rect_list[-1].bottomleft)
+                text_rect_list.append(new_text_rect)
+                
+        return text_rect_list
+        
     def draw(self):
         self.program.screen.fill(background_color)
         
@@ -78,14 +135,16 @@ class ExplorationEncounter:
                      textbox_color,
                      self.textbox_rect)
         if self.state == "waiting_for_input":
-            self.program.screen.blit(self.encounter_text_rendered,
-                                     self.encounter_text_rect)
+            for i in range(len(self.encounter_text_rendered_list)):
+                self.program.screen.blit(self.encounter_text_rendered_list[i],
+                                         self.encounter_text_rect_list[i])
             self.option_1_button.draw()
             self.option_2_button.draw()
             self.option_3_button.draw()
         elif self.state == "resolution":
-            self.program.screen.blit(self.resolution_text_rendered,
-                                     self.resolution_text_rect)
+            for i in range(len(self.resolution_text_rendered_list)):
+                self.program.screen.blit(self.resolution_text_rendered_list[i],
+                                         self.resolution_text_rect_list[i])
             self.continue_button.draw()
         
     def update(self):
@@ -110,11 +169,11 @@ class ExplorationEncounter:
                 self.option_3_button = None
             
             if not self.resolution_text is None:
-                self.resolution_text_rendered = self.font.render(self.resolution_text, False, text_color)
-                self.resolution_text_rect = self.resolution_text_rendered.get_rect(topleft = (text_top, text_left))
+                self.resolution_text_rendered_list = self.render_text_to_multiple_lines(self.resolution_text)
+                self.resolution_text_rect_list = self.get_rendered_rects(self.resolution_text_rendered_list)
                 self.continue_button = Button(program = self.program,
                                               center_position = (0.5,
-                                                             (self.resolution_text_rect.bottom + 1.5 * font_size) / constants.screen_height),
+                                                             (self.resolution_text_rect_list[-1].bottom + 1.5 * font_size) / constants.screen_height),
                                               font = self.font,
                                               text = "continue",
                                               background_color = textbox_color,
