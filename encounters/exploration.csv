@@ -1,0 +1,5 @@
+"area_index-int","node_index-int","encounter_index-int","location_name-str","skip_if_story_keyword-str","only_if_story_keyword-str","prompt-str","option_1_text-str","option_1_result-str","option_1_points_to-int","option_2_text-str","option_2_result-str","option_2_points_to-int","option_3_text-str","option_3_result-str","option_3_points_to-int"
+0,0,0,"the gate of Ithar","entered_gate",NA,"You set out to explore the ruins of Ithar. Some more text to force multiple lines. Even more and more and more... And some more even, maybe we can even get to three lines if we're lucky.","Go through the gate",NA,1,"Turn back",NA,2,"Climb the wall",NA,3
+0,0,1,"the gate of Ithar","entered_gate",NA,"You go through the gate. Let's try to force this to be in multiple lines as well. I'll write another sentence just to make sure that it goes to multiple lines. Should be enough now.","Continue",NA,-1,NA,NA,NA,NA,NA,NA
+0,0,2,"the gate of Ithar","entered_gate",NA,"You want to turn back but something compels you to go in.","Continue",NA,-1,NA,NA,NA,NA,NA,NA
+0,0,3,"the gate of Ithar","entered_gate",NA,"You climb through the wall.","Continue",NA,-1,NA,NA,NA,NA,NA,NA

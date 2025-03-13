@@ -19,14 +19,18 @@ Implementation steps
 - juice: sound effects, music, camerea shake, particle effects etc...
 
 Systems:
-- separate hp & stress (regenerates vs doesn't regenerate between combats)
 - rewards after combat
 - multiple character classes, skills/items
 - keywords to exploration encounter
 - settings/options menu + rules description
 - animate point-crawl
 - build vertical slice demo
+- rename stress to defense
+- redefine game structure (random encounters while traveling, mix of story + combat encounters at locations)
+- rename/redefine stress to defense (s.t. it's decreasing)
 
 Current stuff
 -------------
-- Make PointCrawl class
+- Redefine game structure
+  - Rename encounter_handler to dungeon_master, encounters to scenes etc...
+  - DM would get methods to create encounters & scenes, and encounters would be a series of scenes
