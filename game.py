@@ -3,9 +3,9 @@ import constants
 import menu
 from player import *
 from point_crawl import *
-from combat_encounter import *
-from exploration_encounter import *
-from encounter_handler import *
+from fight_scene import *
+from story_scene import *
+from dungeon_master import *
 
 class Game:
     # constructor
@@ -15,12 +15,12 @@ class Game:
         self.clock = pg.time.Clock()
         self.delta_time = 0
         
-        self.encounter_handler = EncounterHandler(self)
+        self.dungeon_master = DungeonMaster(self)
         
         self.player = None
         
         self.select_character = menu.SelectCharacter(program)
-        self.point_crawl = self.encounter_handler.create_point_crawl(player_start_node = 0)
+        self.point_crawl = self.dungeon_master.create_point_crawl(player_start_node = 0)
         self.encounter = None
         self.state = "select_character"
         
@@ -56,7 +56,7 @@ class Game:
 
             if not self.player is None:
                 self.select_character = None
-                self.encounter = self.encounter_handler.create_exploration_encounter(self.point_crawl.get_player_node())
+                self.encounter = self.dungeon_master.create_story_scene(self.point_crawl.get_player_node())
                 self.state = "exploration_encounter"
         elif self.state == "point_crawl":
             self.point_crawl.update()
@@ -64,10 +64,10 @@ class Game:
                 # additional node-dependent inputs?
                 selected_node = self.point_crawl.graph.nodes[self.point_crawl.pressed_node_index]
                 if selected_node.encounter_type == "combat":
-                    self.encounter = self.encounter_handler.create_combat_encounter(selected_node)
+                    self.encounter = self.dungeon_master.create_fight_scene(selected_node)
                     self.state = "combat_encounter"
                 elif selected_node.encounter_type == "exploration":
-                    self.encounter = self.encounter_handler.create_exploration_encounter(selected_node)
+                    self.encounter = self.dungeon_master.create_story_scene(selected_node)
                     self.state = "exploration_encounter"
         elif self.state == "combat_encounter":
             self.encounter.update()

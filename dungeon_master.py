@@ -2,8 +2,8 @@ import csv
 import pygame as pg
 import constants
 from point_crawl import *
-from combat_encounter import *
-from exploration_encounter import *
+from fight_scene import *
+from story_scene import *
 
 class DataTable:
     def __init__(self, game,
@@ -68,7 +68,7 @@ class DataTable:
         
         self.col_name_to_index = dict([ (self.header[i], i) for i in range(len(self.header)) ])
 
-class EncounterHandler:
+class DungeonMaster:
     def __init__(self, game):
         self.game = game
         
@@ -118,7 +118,7 @@ class EncounterHandler:
                            show_hand = False,
                            color = "tomato")
         
-    def create_combat_encounter(self, selected_node):
+    def create_fight_scene(self, selected_node):
         player_fighter = Fighter(game = self.game,
                                  is_left_player = True,
                                  is_human_controlled = True,
@@ -130,11 +130,11 @@ class EncounterHandler:
         
         enemy_fighter = self.find_enemy_fighter(selected_node.index)
         
-        return CombatEncounter(self.game.program,
-                               player = player_fighter,
-                               enemy = enemy_fighter)
+        return FightScene(self.game.program,
+                          player = player_fighter,
+                          enemy = enemy_fighter)
     
-    def create_exploration_encounter(self, selected_node):
+    def create_story_scene(self, selected_node):
         encounter_row = None
         option_1_resolution_text = None
         option_2_resolution_text = None
@@ -151,12 +151,12 @@ class EncounterHandler:
                 elif row[self.exploration_encounters.col_name_to_index["encounter_index"]] == 3:
                     option_3_resolution_text = row[self.exploration_encounters.col_name_to_index["prompt"]]
         
-        return ExplorationEncounter(program = self.game.program,
-                                    encounter_text = encounter_row[self.exploration_encounters.col_name_to_index["prompt"]],
-                                    option_1_text = encounter_row[self.exploration_encounters.col_name_to_index["option_1_text"]],
-                                    option_2_text = encounter_row[self.exploration_encounters.col_name_to_index["option_2_text"]],
-                                    option_3_text = encounter_row[self.exploration_encounters.col_name_to_index["option_3_text"]],
-                                    resolution_options = [option_1_resolution_text,
-                                                          option_2_resolution_text,
-                                                          option_3_resolution_text])
+        return StoryScene(program = self.game.program,
+                          encounter_text = encounter_row[self.exploration_encounters.col_name_to_index["prompt"]],
+                          option_1_text = encounter_row[self.exploration_encounters.col_name_to_index["option_1_text"]],
+                          option_2_text = encounter_row[self.exploration_encounters.col_name_to_index["option_2_text"]],
+                          option_3_text = encounter_row[self.exploration_encounters.col_name_to_index["option_3_text"]],
+                          resolution_options = [option_1_resolution_text,
+                                                option_2_resolution_text,
+                                                option_3_resolution_text])
                     

@@ -20,7 +20,7 @@ text_color = "black"
 button_idle_color = "black"
 button_active_color = "white"
 
-class ExplorationEncounter:
+class StoryScene:
     def __init__(self, program,
                  encounter_text,
                  option_1_text,

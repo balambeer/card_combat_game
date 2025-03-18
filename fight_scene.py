@@ -5,7 +5,7 @@ from card import *
 from deck import *
 from fighter import *
 
-class CombatEncounter:
+class FightScene:
     # Constructor
     def __init__(self, program,
                  player,
