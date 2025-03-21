@@ -15,7 +15,7 @@ class DataTable:
         for row in self.data:
             print(row)
             print(type(row))
-            print(row[self.col_name_to_index["node_index"]])
+            # print(row[self.col_name_to_index["location_index"]])
 
     def read_csv(self, path):
         raw_table = []
@@ -72,20 +72,21 @@ class DungeonMaster:
     def __init__(self, game):
         self.game = game
         
-        self.exploration_encounters = DataTable(self, "encounters/exploration.csv")
+        self.scene_library = DataTable(self, "encounters/scene_library.csv")
         self.point_crawl = DataTable(self, "encounters/point_crawl.csv")
-        self.monsters = DataTable(self, "encounters/monsters.csv")
+        self.monster_manual = DataTable(self, "encounters/monster_manual.csv")
+        
+        self.current_scene_index = None
         
     def create_point_crawl_graph(self):
         nodes = []
         edges = []
         
         for row in self.point_crawl.data:
-            node_index = row[self.point_crawl.col_name_to_index["node_index"]]
+            node_index = row[self.point_crawl.col_name_to_index["location_index"]]
             new_node = GraphNode(index = node_index,
                                  position = support.XY(row[self.point_crawl.col_name_to_index["position_x"]],
-                                                       row[self.point_crawl.col_name_to_index["position_y"]]),
-                                 encounter_type = row[self.point_crawl.col_name_to_index["encounter_type"]])
+                                                       row[self.point_crawl.col_name_to_index["position_y"]]))
             nodes.append(new_node)
             
             for i in row[self.point_crawl.col_name_to_index["neighbor_nodes"]]:
@@ -101,24 +102,40 @@ class DungeonMaster:
                           graph,
                           player_start_node)
     
-    def find_enemy_fighter(self, node_index):
+    def find_scene_in_library(self, location_index, scene_index):
+        scene_row = None
+        
+        print("in find_scene_in_library:")
+        print(location_index)
+        print(scene_index)
+        
+        for row in self.scene_library.data:
+            if row[self.scene_library.col_name_to_index["location_index"]] == location_index and row[self.scene_library.col_name_to_index["scene_index"]] == scene_index:
+                scene_row = row
+            
+        return scene_row
+    
+    def find_monster_in_manual(self, monster_name):
         monster_row = None
-        for row in self.monsters.data:
-            if row[self.monsters.col_name_to_index["node_index"]] == node_index:
+        for row in self.monster_manual.data:
+            if row[self.monster_manual.col_name_to_index["monster_name"]] == monster_name:
                 # TODO: break out of the loop when the monster is found
                 monster_row = row
                 
+        return monster_row
+    
+    def create_enemy_fighter(self, monster_row):                
         if not monster_row is None:
             return Fighter(game = self.game,
                            is_left_player = False,
                            is_human_controlled = False,
-                           hp = monster_row[self.monsters.col_name_to_index["hp"]],
-                           max_stress = monster_row[self.monsters.col_name_to_index["max_defense"]],
-                           card_list = monster_row[self.monsters.col_name_to_index["card_list"]],
+                           hp = monster_row[self.monster_manual.col_name_to_index["hp"]],
+                           max_stress = monster_row[self.monster_manual.col_name_to_index["max_defense"]],
+                           card_list = monster_row[self.monster_manual.col_name_to_index["card_list"]],
                            show_hand = False,
                            color = "tomato")
         
-    def create_fight_scene(self, selected_node):
+    def create_fight_scene(self, scene_row):
         player_fighter = Fighter(game = self.game,
                                  is_left_player = True,
                                  is_human_controlled = True,
@@ -127,36 +144,40 @@ class DungeonMaster:
                                  card_list = self.game.player.card_list,
                                  show_hand = True,
                                  color = "cornflowerblue")
-        
-        enemy_fighter = self.find_enemy_fighter(selected_node.index)
+
+        monster_row = self.find_monster_in_manual(scene_row[self.scene_library.col_name_to_index["monster_name"]])
+        enemy_fighter = self.create_enemy_fighter(monster_row)
         
         return FightScene(self.game.program,
                           player = player_fighter,
-                          enemy = enemy_fighter)
+                          enemy = enemy_fighter,
+                          next_scene = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
     
-    def create_story_scene(self, selected_node):
-        encounter_row = None
-        option_1_resolution_text = None
-        option_2_resolution_text = None
-        option_3_resolution_text = None
-        
-        for row in self.exploration_encounters.data:
-            if row[self.exploration_encounters.col_name_to_index["node_index"]] == selected_node.index:
-                if row[self.exploration_encounters.col_name_to_index["encounter_index"]] == 0:
-                    encounter_row = row
-                elif row[self.exploration_encounters.col_name_to_index["encounter_index"]] == 1:
-                    option_1_resolution_text = row[self.exploration_encounters.col_name_to_index["prompt"]]
-                elif row[self.exploration_encounters.col_name_to_index["encounter_index"]] == 2:
-                    option_2_resolution_text = row[self.exploration_encounters.col_name_to_index["prompt"]]
-                elif row[self.exploration_encounters.col_name_to_index["encounter_index"]] == 3:
-                    option_3_resolution_text = row[self.exploration_encounters.col_name_to_index["prompt"]]
+    def create_story_scene(self, scene_row):        
+        option_1 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_1_text"]],
+                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_1_effect"]],
+                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
+        option_2 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_2_text"]],
+                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_2_effect"]],
+                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_2_next_scene"]])
+        option_3 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_3_text"]],
+                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_3_effect"]],
+                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_3_next_scene"]])
         
         return StoryScene(program = self.game.program,
-                          encounter_text = encounter_row[self.exploration_encounters.col_name_to_index["prompt"]],
-                          option_1_text = encounter_row[self.exploration_encounters.col_name_to_index["option_1_text"]],
-                          option_2_text = encounter_row[self.exploration_encounters.col_name_to_index["option_2_text"]],
-                          option_3_text = encounter_row[self.exploration_encounters.col_name_to_index["option_3_text"]],
-                          resolution_options = [option_1_resolution_text,
-                                                option_2_resolution_text,
-                                                option_3_resolution_text])
+                          prompt = scene_row[self.scene_library.col_name_to_index["prompt"]],
+                          option_1 = option_1,
+                          option_2 = option_2,
+                          option_3 = option_3)
+    
+    def create_scene(self, location_index, scene_index):
+        scene_row = self.find_scene_in_library(location_index, scene_index)
+        
+        if scene_row[self.scene_library.col_name_to_index["scene_type"]] == "story":
+            scene = self.create_story_scene(scene_row)
+        elif scene_row[self.scene_library.col_name_to_index["scene_type"]] == "combat":
+            scene = self.create_fight_scene(scene_row)
+    
+        return scene
+
                     

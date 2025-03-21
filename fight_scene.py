@@ -9,15 +9,17 @@ class FightScene:
     # Constructor
     def __init__(self, program,
                  player,
-                 enemy):
+                 enemy,
+                 next_scene):
         self.program = program
         
         self.state = "ongoing"
+        self.scene_type = "fight"
+        self.next_scene = next_scene
         
         self.is_fighter_1_leading = True
         self.trick_resolved = False
 
-        # TODO: these things should be passed...
         self.fighter_1 = player
         self.fighter_2 = enemy
         
@@ -77,7 +79,7 @@ class FightScene:
     # def update_game_state(self):
     def update(self):
         if self.check_combat_over_condition():
-            self.state = "combat_over"
+            self.state = "scene_over"
         else:
             self.program.game.delta_time = self.program.game.clock.tick(constants.fps)
             # manage players

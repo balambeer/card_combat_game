@@ -1,2 +1,0 @@
-"area_index-int","node_index-int","location_name-str","hp-int","max_defense-int","card_list-cardlist"
-0,1,"ruined temple",3,7,"[(1,spear);(2,spear);(3,spear);(1,mana);(2,mana);(3,mana);(1,trump);(2,trump);(3,trump)]"

@@ -56,35 +56,29 @@ class Game:
 
             if not self.player is None:
                 self.select_character = None
-                self.encounter = self.dungeon_master.create_story_scene(self.point_crawl.get_player_node())
-                self.state = "exploration_encounter"
+                self.encounter = self.dungeon_master.create_scene(self.point_crawl.get_player_node().index, 0)
+                self.state = "encounter"
         elif self.state == "point_crawl":
             self.point_crawl.update()
             if self.point_crawl.state == "next_node_selected":
-                # additional node-dependent inputs?
-                selected_node = self.point_crawl.graph.nodes[self.point_crawl.pressed_node_index]
-                if selected_node.encounter_type == "combat":
-                    self.encounter = self.dungeon_master.create_fight_scene(selected_node)
-                    self.state = "combat_encounter"
-                elif selected_node.encounter_type == "exploration":
-                    self.encounter = self.dungeon_master.create_story_scene(selected_node)
-                    self.state = "exploration_encounter"
-        elif self.state == "combat_encounter":
+                self.encounter = self.dungeon_master.create_scene(self.point_crawl.get_player_node().index, 0)
+                self.state = "encounter"
+        elif self.state == "encounter":
             self.encounter.update()
-            if self.encounter.state == "combat_over":
-                if self.encounter.fighter_1.hp <= 0:
-                    self.state = "game_over"
-                else:
-                    self.player.hp = self.encounter.fighter_1.hp
+            if self.encounter.state == "scene_over":
+                if self.encounter.scene_type == "fight":
+                    if self.encounter.fighter_1.hp <= 0:
+                        self.state = "game_over"
+                    else:
+                        self.player.hp = self.encounter.fighter_1.hp
+                
+                if self.encounter.next_scene < 0:
                     self.state = "point_crawl"
                     self.point_crawl.state = "waiting_for_input"
-                self.encounter = None
-        elif self.state == "exploration_encounter":
-            self.encounter.update()
-            if self.encounter.state == "exploration_over":
-                self.state = "point_crawl"
-                self.point_crawl_state = "waiting_for_input"
-                self.encounter = None
+                    self.encounter = None
+                else:
+                    self.encounter = self.dungeon_master.create_scene(self.point_crawl.get_player_node().index,
+                                                                      self.encounter.next_scene)
                 
     def draw(self):
         pg.display.flip()
@@ -92,8 +86,6 @@ class Game:
             self.select_character.draw()
         elif self.state == "point_crawl":
             self.point_crawl.draw()
-        elif self.state == "combat_encounter":
-            self.encounter.draw()
-        elif self.state == "exploration_encounter":
+        elif self.state == "encounter":
             self.encounter.draw()
     

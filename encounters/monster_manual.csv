@@ -1,0 +1,2 @@
+"monster_name-str","hp-int","max_defense-int","card_list-cardlist"
+"monster1",3,7,"[(1,spear);(2,spear);(3,spear);(1,mana);(2,mana);(3,mana);(1,trump);(2,trump);(3,trump)]"

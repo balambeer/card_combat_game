@@ -14,11 +14,10 @@ point_crawl_player_size = int(0.75 * point_crawl_node_size) // 2
 
 class GraphNode():
     # constructor
-    def __init__(self, index, position, encounter_type):
+    def __init__(self, index, position):
         self.rect = pg.Rect((position.x - point_crawl_node_size // 2,
                              position.y - point_crawl_node_size // 2),
                             (point_crawl_node_size, point_crawl_node_size))
-        self.encounter_type = encounter_type
         self.index = index
 
 class Graph():

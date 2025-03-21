@@ -20,56 +20,70 @@ text_color = "black"
 button_idle_color = "black"
 button_active_color = "white"
 
+class ProgressionOption:
+    def __init__(self,
+                 option_text,
+                 option_effect,
+                 option_next_scene):
+        self.text = option_text
+        self.effect = option_effect
+        self.next_scene = option_next_scene
+
 class StoryScene:
     def __init__(self, program,
-                 encounter_text,
-                 option_1_text,
-                 option_2_text,
-                 option_3_text,
-                 resolution_options):
+                 prompt,
+                 option_1,
+                 option_2,
+                 option_3):
         self.program = program
+        
         self.state = "waiting_for_input"
+        self.scene_type = "story"
+        self.next_scene = None
         
         self.font = pg.font.Font(None, font_size)
         
-        self.encounter_text = encounter_text
-        self.option_1_text = option_1_text
-        self.option_2_text = option_2_text
-        self.option_3_text = option_3_text
+        self.encounter_text = prompt
+        self.option_1 = option_1
+        self.option_2 = option_2
+        self.option_3 = option_3
         
         self.textbox_rect = pg.Rect((textbox_left, textbox_top),
                                     (textbox_width, textbox_height))
         self.encounter_text_rendered_list = self.render_text_to_multiple_lines(self.encounter_text)
         self.encounter_text_rect_list = self.get_rendered_rects(self.encounter_text_rendered_list)
         
-        self.option_1_button = Button(program = program,
-                                      center_position = (0.5,
-                                                         (self.encounter_text_rect_list[-1].bottom + 1.5 * font_size) / constants.screen_height),
-                                      font = self.font,
-                                      text = option_1_text,
-                                      background_color = textbox_color,
-                                      idle_color = button_idle_color,
-                                      active_color = button_active_color)
-        self.option_2_button = Button(program = program,
-                                      center_position = (0.5,
-                                                         (self.option_1_button.text_rect.bottom + 1.5 * font_size) / constants.screen_height),
-                                      font = self.font,
-                                      text = option_2_text,
-                                      background_color = textbox_color,
-                                      idle_color = button_idle_color,
-                                      active_color = button_active_color)
-        self.option_3_button = Button(program = program,
-                                      center_position = (0.5,
-                                                         (self.option_2_button.text_rect.bottom + 1.5 * font_size) / constants.screen_height),
-                                      font = self.font,
-                                      text = option_3_text,
-                                      background_color = textbox_color,
-                                      idle_color = button_idle_color,
-                                      active_color = button_active_color)
+        self.option_1_button = None
+        self.option_2_button = None
+        self.option_3_button = None
         
-        self.resolution_options = resolution_options
-        self.resolution_text = None
-        self.continue_button = None
+        if not self.option_1 is None:
+            self.option_1_button = Button(program = program,
+                                          center_position = (0.5,
+                                                             (self.encounter_text_rect_list[-1].bottom + 1.5 * font_size) / constants.screen_height),
+                                          font = self.font,
+                                          text = self.option_1.text,
+                                          background_color = textbox_color,
+                                          idle_color = button_idle_color,
+                                          active_color = button_active_color)
+        if not self.option_2 is None:
+            self.option_2_button = Button(program = program,
+                                          center_position = (0.5,
+                                                             (self.option_1_button.text_rect.bottom + 1.5 * font_size) / constants.screen_height),
+                                          font = self.font,
+                                          text = self.option_2.text,
+                                          background_color = textbox_color,
+                                          idle_color = button_idle_color,
+                                          active_color = button_active_color)
+        if not self.option_3 is None:
+            self.option_3_button = Button(program = program,
+                                          center_position = (0.5,
+                                                             (self.option_2_button.text_rect.bottom + 1.5 * font_size) / constants.screen_height),
+                                          font = self.font,
+                                          text = self.option_3.text,
+                                          background_color = textbox_color,
+                                          idle_color = button_idle_color,
+                                          active_color = button_active_color)
         
     def render_next_line(self, remaining_text):
         text_rendered = self.font.render(remaining_text, False, text_color)
@@ -138,50 +152,26 @@ class StoryScene:
             for i in range(len(self.encounter_text_rendered_list)):
                 self.program.screen.blit(self.encounter_text_rendered_list[i],
                                          self.encounter_text_rect_list[i])
-            self.option_1_button.draw()
-            self.option_2_button.draw()
-            self.option_3_button.draw()
-        elif self.state == "resolution":
-            for i in range(len(self.resolution_text_rendered_list)):
-                self.program.screen.blit(self.resolution_text_rendered_list[i],
-                                         self.resolution_text_rect_list[i])
-            self.continue_button.draw()
+            if not self.option_1_button is None:
+                self.option_1_button.draw()
+            if not self.option_2_button is None:
+                self.option_2_button.draw()
+            if not self.option_3_button is None:
+                self.option_3_button.draw()
         
     def update(self):
         if self.state == "waiting_for_input":
-            if self.option_1_button.is_left_clicked():
-                self.state = "resolution"
-                self.resolution_text = self.resolution_options[0]
-                self.option_1_button = None
-                self.option_2_button = None
-                self.option_3_button = None
-            elif self.option_2_button.is_left_clicked():
-                self.state = "resolution"
-                self.resolution_text = self.resolution_options[1]
-                self.option_1_button = None
-                self.option_2_button = None
-                self.option_3_button = None
-            elif self.option_3_button.is_left_clicked():
-                self.state = "resolution"
-                self.resolution_text = self.resolution_options[2]
-                self.option_1_button = None
-                self.option_2_button = None
-                self.option_3_button = None
-            
-            if not self.resolution_text is None:
-                self.resolution_text_rendered_list = self.render_text_to_multiple_lines(self.resolution_text)
-                self.resolution_text_rect_list = self.get_rendered_rects(self.resolution_text_rendered_list)
-                self.continue_button = Button(program = self.program,
-                                              center_position = (0.5,
-                                                             (self.resolution_text_rect_list[-1].bottom + 1.5 * font_size) / constants.screen_height),
-                                              font = self.font,
-                                              text = "continue",
-                                              background_color = textbox_color,
-                                              idle_color = button_idle_color,
-                                              active_color = button_active_color)
-        
-        elif self.state == "resolution":
-            if self.continue_button.is_left_clicked():
-                self.state = "exploration_over"
+            if not self.option_1_button is None:
+                if self.option_1_button.is_left_clicked():
+                    self.state = "scene_over"
+                    self.next_scene = self.option_1.next_scene
+            if not self.option_2_button is None:
+                if self.option_2_button.is_left_clicked():
+                    self.state = "scene_over"
+                    self.next_scene = self.option_2.next_scene
+            if not self.option_3_button is None:
+                if self.option_3_button.is_left_clicked():
+                    self.state = "scene_over"
+                    self.next_scene = self.option_3.next_scene
         
         

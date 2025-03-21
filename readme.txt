@@ -32,5 +32,4 @@ Systems:
 Current stuff
 -------------
 - Redefine game structure
-  - Rename encounter_handler to dungeon_master, encounters to scenes etc...
-  - DM would get methods to create encounters & scenes, and encounters would be a series of scenes
+  - Story scenes trigger/don't trigger on keywords
