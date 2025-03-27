@@ -40,6 +40,7 @@ class StoryScene:
         self.state = "waiting_for_input"
         self.scene_type = "story"
         self.next_scene = None
+        self.effect = None
         
         self.font = pg.font.Font(None, font_size)
         
@@ -165,13 +166,16 @@ class StoryScene:
                 if self.option_1_button.is_left_clicked():
                     self.state = "scene_over"
                     self.next_scene = self.option_1.next_scene
+                    self.effect = self.option_1.effect
             if not self.option_2_button is None:
                 if self.option_2_button.is_left_clicked():
                     self.state = "scene_over"
                     self.next_scene = self.option_2.next_scene
+                    self.effect = self.option_2.effect
             if not self.option_3_button is None:
                 if self.option_3_button.is_left_clicked():
                     self.state = "scene_over"
                     self.next_scene = self.option_3.next_scene
+                    self.effect = self.option_3.effect
         
         

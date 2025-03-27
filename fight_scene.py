@@ -16,6 +16,7 @@ class FightScene:
         self.state = "ongoing"
         self.scene_type = "fight"
         self.next_scene = next_scene
+        self.effect = None
         
         self.is_fighter_1_leading = True
         self.trick_resolved = False

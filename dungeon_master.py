@@ -102,16 +102,29 @@ class DungeonMaster:
                           graph,
                           player_start_node)
     
-    def find_scene_in_library(self, location_index, scene_index):
+    def find_scene_in_library(self, location_index, scene_index, player_keywords):
         scene_row = None
         
-        print("in find_scene_in_library:")
-        print(location_index)
-        print(scene_index)
-        
         for row in self.scene_library.data:
-            if row[self.scene_library.col_name_to_index["location_index"]] == location_index and row[self.scene_library.col_name_to_index["scene_index"]] == scene_index:
-                scene_row = row
+            row_location_index = row[self.scene_library.col_name_to_index["location_index"]]
+            row_scene_index = row[self.scene_library.col_name_to_index["scene_index"]]
+            if (row_location_index == location_index and row_scene_index == scene_index):
+                if row_scene_index == 0:
+                    row_skip_keyword = row[self.scene_library.col_name_to_index["skip_if_story_keyword"]]
+                    if row_skip_keyword is None:
+                        row_skip_keyword = ""
+                    if not row_skip_keyword in player_keywords:
+                        row_trigger_keyword = row[self.scene_library.col_name_to_index["only_if_story_keyword"]]
+                        if row_trigger_keyword is None:
+                            scene_row = row
+                            break
+                        else:
+                            if row_trigger_keyword in player_keywords:
+                                scene_row = row
+                                break
+                else:
+                    scene_row = row
+                    break
             
         return scene_row
     
@@ -119,8 +132,8 @@ class DungeonMaster:
         monster_row = None
         for row in self.monster_manual.data:
             if row[self.monster_manual.col_name_to_index["monster_name"]] == monster_name:
-                # TODO: break out of the loop when the monster is found
                 monster_row = row
+                break
                 
         return monster_row
     
@@ -170,8 +183,8 @@ class DungeonMaster:
                           option_2 = option_2,
                           option_3 = option_3)
     
-    def create_scene(self, location_index, scene_index):
-        scene_row = self.find_scene_in_library(location_index, scene_index)
+    def create_scene(self, location_index, scene_index, player_keywords):
+        scene_row = self.find_scene_in_library(location_index, scene_index, player_keywords)
         
         if scene_row[self.scene_library.col_name_to_index["scene_type"]] == "story":
             scene = self.create_story_scene(scene_row)

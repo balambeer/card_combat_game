@@ -21,15 +21,14 @@ Implementation steps
 Systems:
 - rewards after combat
 - multiple character classes, skills/items
-- keywords to exploration encounter
 - settings/options menu + rules description
 - animate point-crawl
 - build vertical slice demo
-- rename stress to defense
 - redefine game structure (random encounters while traveling, mix of story + combat encounters at locations)
 - rename/redefine stress to defense (s.t. it's decreasing)
 
 Current stuff
 -------------
 - Redefine game structure
-  - Story scenes trigger/don't trigger on keywords
+  - Build a 3 node mini-setup
+  - Point crawl: must move to a different & neighboring location
