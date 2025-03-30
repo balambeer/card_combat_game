@@ -10,12 +10,12 @@ class FightScene:
     def __init__(self, program,
                  player,
                  enemy,
-                 next_scene):
+                 next_scene_options):
         self.program = program
         
         self.state = "ongoing"
         self.scene_type = "fight"
-        self.next_scene = next_scene
+        self.next_scene_options = next_scene_options
         self.effect = None
         
         self.is_fighter_1_leading = True
@@ -77,8 +77,8 @@ class FightScene:
                 self.fighter_2.take_damage(damage_and_next_lead[0], True)
                 self.is_fighter_1_leading = not self.is_fighter_1_leading            
     
-    # def update_game_state(self):
-    def update(self):
+    # need to pass keywords to match signature of story scene update
+    def update(self, story_keywords):
         if self.check_combat_over_condition():
             self.state = "scene_over"
         else:

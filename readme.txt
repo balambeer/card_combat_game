@@ -24,11 +24,17 @@ Systems:
 - settings/options menu + rules description
 - animate point-crawl
 - build vertical slice demo
-- redefine game structure (random encounters while traveling, mix of story + combat encounters at locations)
+- redefine game structure (random encounters while traveling)
 - rename/redefine stress to defense (s.t. it's decreasing)
 
 Current stuff
 -------------
 - Redefine game structure
   - Build a 3 node mini-setup
-  - Point crawl: must move to a different & neighboring location
+
+Demo story outline
+------------------
+- Set in a city like that of Thief. Walled off district due to some cataclysm.
+- Some patron wants to retrieve an old family heirloom from a mansion. Maybe a dagger/sword or a statue.
+- Mansion's rough location available (look at map from Thief 1). Family crest is a chimera.
+- A pet chimera used to guard the family mansion/vault, still alive (boss).

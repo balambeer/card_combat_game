@@ -143,6 +143,20 @@ class DungeonMaster:
                            show_hand = False,
                            color = "tomato")
         
+    def find_next_scene_index(self, next_scene_options_string, player_keywords):
+        stripped_string = next_scene_options_string.strip("[]")
+        next_scene_options_list = stripped_string.split(";")
+        
+        next_scene_index = int(next_scene_options_list[0]) # default
+        # take first option with matching keyword if any
+        if len(next_scene_options_list) > 1:
+            for i in range(1, len(next_scene_options_list)):
+                keyword_and_index = next_scene_options_list[i].split(":")
+                if keyword_and_index[0] in player_keywords:
+                    next_scene_index = int(keyword_and_index[1])
+                    break
+        return next_scene_index 
+        
     def create_fight_scene(self, scene_row):
         player_fighter = Fighter(game = self.game,
                                  is_left_player = True,
@@ -159,17 +173,16 @@ class DungeonMaster:
         return FightScene(self.game.program,
                           player = player_fighter,
                           enemy = enemy_fighter,
-                          next_scene = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
+                          next_scene_options = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
     
     def create_story_option(self, scene_row, option_index, player_keywords):
         option_skip_keyword = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_skip_if"]]
         option_trigger_keyword = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_only_if"]]
     
-        print("creating option " + str(option_index))
         if self.trigger_by_keywords(option_skip_keyword, option_trigger_keyword, player_keywords):
-            return ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_text"]],
-                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_effect"]],
-                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_next_scene"]])
+            return ProgressionOption(text = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_text"]],
+                                     effect = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_effect"]],
+                                     next_scene_options = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_next_scene"]])
         else:
             return None
     

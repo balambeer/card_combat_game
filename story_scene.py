@@ -22,12 +22,12 @@ button_active_color = "white"
 
 class ProgressionOption:
     def __init__(self,
-                 option_text,
-                 option_effect,
-                 option_next_scene):
-        self.text = option_text
-        self.effect = option_effect
-        self.next_scene = option_next_scene
+                 text,
+                 effect,
+                 next_scene_options):
+        self.text = text
+        self.effect = effect
+        self.next_scene_options = next_scene_options
 
 class StoryScene:
     def __init__(self, program,
@@ -39,7 +39,7 @@ class StoryScene:
         
         self.state = "waiting_for_input"
         self.scene_type = "story"
-        self.next_scene = None
+        self.next_scene_options = None
         self.effect = None
         
         self.font = pg.font.Font(None, font_size)
@@ -160,22 +160,22 @@ class StoryScene:
             if not self.option_3_button is None:
                 self.option_3_button.draw()
         
-    def update(self):
+    def update(self, player_keywords):
         if self.state == "waiting_for_input":
             if not self.option_1_button is None:
                 if self.option_1_button.is_left_clicked():
                     self.state = "scene_over"
-                    self.next_scene = self.option_1.next_scene
+                    self.next_scene_options = self.option_1.next_scene_options
                     self.effect = self.option_1.effect
             if not self.option_2_button is None:
                 if self.option_2_button.is_left_clicked():
                     self.state = "scene_over"
-                    self.next_scene = self.option_2.next_scene
+                    self.next_scene_options = self.option_2.next_scene_options
                     self.effect = self.option_2.effect
             if not self.option_3_button is None:
                 if self.option_3_button.is_left_clicked():
                     self.state = "scene_over"
-                    self.next_scene = self.option_3.next_scene
+                    self.next_scene_options = self.option_3.next_scene_options
                     self.effect = self.option_3.effect
         
         

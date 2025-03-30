@@ -85,7 +85,7 @@ class Game:
                                                                   player_keywords = self.player.story_keywords)
                 self.state = "encounter"
         elif self.state == "encounter":
-            self.encounter.update()
+            self.encounter.update(self.player.story_keywords)
             if self.encounter.state == "scene_over":
                 if self.encounter.scene_type == "fight":
                     if self.encounter.fighter_1.hp <= 0:
@@ -97,13 +97,15 @@ class Game:
                     print("resolving encounter effect")
                     self.resolve_scene_effect(self.encounter.effect)
                 
-                if self.encounter.next_scene < 0:
+                next_scene_index = self.dungeon_master.find_next_scene_index(self.encounter.next_scene_options,
+                                                                             self.player.story_keywords)
+                if next_scene_index < 0:
                     self.state = "point_crawl"
                     self.point_crawl.state = "waiting_for_input"
                     self.encounter = None
                 else:
                     self.encounter = self.dungeon_master.create_scene(location_index = self.point_crawl.get_player_node().index,
-                                                                      scene_index = self.encounter.next_scene,
+                                                                      scene_index = next_scene_index,
                                                                       player_keywords = self.player.story_keywords)
                 
     def draw(self):
