@@ -36,6 +36,7 @@ class PointCrawl:
         self.graph = graph
         
         self.player_node_index = player_start_node_index
+        self.neighbor_node_indexes = self.find_neighbors()
         self.active_node_index = None
         self.pressed_node_index = None
         
@@ -45,6 +46,18 @@ class PointCrawl:
         
     def get_player_node(self):
         return self.graph.nodes[self.player_node_index]
+    
+    def find_neighbors(self):
+        neighbors = []
+        for edge in self.graph.edges:
+            if edge[0] == self.player_node_index:
+                if not edge[1] in neighbors:
+                    neighbors.append(edge[1])
+            if edge[1] == self.player_node_index:
+                if not edge[0] in neighbors:
+                    neighbors.append(edge[0])
+                    
+        return neighbors
     
     def update_nodes(self):
         player_position = self.graph.nodes[self.player_node_index].rect.center
@@ -60,12 +73,13 @@ class PointCrawl:
         if self.state == "waiting_for_input":
             self.active_node_index = None
             self.pressed_node_index = None
-            for i in range(len(self.graph.nodes)):
+            for i in self.neighbor_node_indexes:
                 if self.graph.nodes[i].rect.collidepoint(pg.mouse.get_pos()):
                     self.active_node_index = i
                     if pg.mouse.get_pressed()[0]:
                         self.pressed_node_index = i
                         self.player_node_index = self.pressed_node_index
+                        self.neighbor_node_indexes = self.find_neighbors()
                         self.state = "next_node_selected"
         elif not self.pressed_node_index is None:
             self.state = "waiting_for_input"
