@@ -20,12 +20,10 @@ Implementation steps
 
 Systems:
 - rewards after combat
-- multiple character classes, skills/items
 - settings/options menu + rules description
 - animate point-crawl
 - build vertical slice demo
 - redefine game structure (random encounters while traveling)
-- rename/redefine stress to defense (s.t. it's decreasing)
 
 Current stuff
 -------------

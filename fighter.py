@@ -10,7 +10,7 @@ class Fighter:
                  is_left_player,
                  is_human_controlled,
                  hp,
-                 max_stress,
+                 max_defense,
                  card_list,
                  show_hand,
                  color):
@@ -23,13 +23,13 @@ class Fighter:
         
         self.color = color
         self.hp = hp
-        self.stress = 0
-        self.max_stress = max_stress
+        self.defense = max_defense
+        self.max_defense = max_defense
         self.font = pg.font.Font(None, constants.player_hp_size)
         self.hp_rendered = self.render_hp() # self.font.render("HP: " + str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
-        self.stress_rendered = self.render_stress() # self.font.render("S: " + str(self.stress) + " (" + str(self.max_stress) + ")", False, self.color)
-        self.stress_rect = self.set_stress_rect() # self.sress_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+        self.defense_rendered = self.render_defense() # self.font.render("S: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
+        self.defense_rect = self.set_defense_rect() # self.sress_rendered.get_rect(topleft = self.hp_rect.bottomleft)
         
         self.state = "clean_up"
         self.todo = "nothing"
@@ -50,13 +50,13 @@ class Fighter:
         self.play_area = self.create_play_area(self.is_left_player)
         
     def damage_tolerance(self):
-        return self.hp + (self.max_stress - self.stress)
+        return self.hp + self.defense
         
     def render_hp(self):
         return self.font.render("HP: " + str(self.hp), False, self.color)
     
-    def render_stress(self):
-        return self.font.render("S: " + str(self.stress) + " (" + str(self.max_stress) + ")", False, self.color)
+    def render_defense(self):
+        return self.font.render("Def: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
         
     def set_hp_rect(self, is_left_player):
         hp_rect_center_left = int(constants.player_hp_rect_center_ratio.x * constants.screen_width)
@@ -65,8 +65,8 @@ class Fighter:
         return self.hp_rendered.get_rect(center = (hp_rect_center_left,
                                                    int(constants.player_hp_rect_center_ratio.y * constants.screen_height)))
     
-    def set_stress_rect(self):
-        return self.stress_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+    def set_defense_rect(self):
+        return self.defense_rendered.get_rect(topleft = self.hp_rect.bottomleft)
     
     def set_character_animation_rect(self):
         if self.is_left_player:
@@ -141,9 +141,9 @@ class Fighter:
                     face_up = show_hand,
                     is_pile = False)
     
-    def display_hp_and_stress(self):
+    def display_hp_and_defense(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
-        self.game.program.screen.blit(self.stress_rendered, self.stress_rect)
+        self.game.program.screen.blit(self.defense_rendered, self.defense_rect)
         
     def display_damage(self):
         self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - constants.player_damage_drift_v * self.game.delta_time),
@@ -163,7 +163,7 @@ class Fighter:
         self.discard_pile.draw()
         self.play_area.draw()
         self.display_character()
-        self.display_hp_and_stress()
+        self.display_hp_and_defense()
         if self.damage_animation_clock > 0:
             self.damage_animation_clock -= self.game.delta_time
             self.display_damage()
@@ -229,14 +229,14 @@ class Fighter:
         self.character_animation_frame = constants.player_character_animation_killing_blow_frame_count
                 
     def take_damage(self, damage, was_riposte):
-        stress_damage = min(damage, self.max_stress - self.stress)
-        hp_damage = damage - stress_damage
-        self.stress = self.stress + stress_damage
+        defense_damage = min(damage, self.defense)
+        hp_damage = damage - defense_damage
+        self.defense = self.defense - defense_damage
         self.hp = max(0, self.hp - hp_damage)
         self.hp_rendered = self.render_hp() # self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
-        self.stress_rendered = self.render_stress()
-        self.stress_rect = self.set_stress_rect()
+        self.defense_rendered = self.render_defense()
+        self.defense_rect = self.set_defense_rect()
         
         if damage > 0:
             self.damage_animation_clock = constants.player_damage_animation_length_in_ms
