@@ -102,6 +102,12 @@ class DungeonMaster:
                           graph,
                           player_start_node)
     
+    def trigger_by_keywords(self, skip_keyword, trigger_keyword, player_keywords):            
+        if (skip_keyword is None) or (not skip_keyword in player_keywords):
+            return (trigger_keyword is None) or (trigger_keyword in player_keywords)
+        else:
+            return False
+    
     def find_scene_in_library(self, location_index, scene_index, player_keywords):
         scene_row = None
         
@@ -109,20 +115,9 @@ class DungeonMaster:
             row_location_index = row[self.scene_library.col_name_to_index["location_index"]]
             row_scene_index = row[self.scene_library.col_name_to_index["scene_index"]]
             if (row_location_index == location_index and row_scene_index == scene_index):
-                if row_scene_index == 0:
-                    row_skip_keyword = row[self.scene_library.col_name_to_index["skip_if_story_keyword"]]
-                    if row_skip_keyword is None:
-                        row_skip_keyword = ""
-                    if not row_skip_keyword in player_keywords:
-                        row_trigger_keyword = row[self.scene_library.col_name_to_index["only_if_story_keyword"]]
-                        if row_trigger_keyword is None:
-                            scene_row = row
-                            break
-                        else:
-                            if row_trigger_keyword in player_keywords:
-                                scene_row = row
-                                break
-                else:
+                row_skip_keyword = row[self.scene_library.col_name_to_index["skip_if_story_keyword"]]
+                row_trigger_keyword = row[self.scene_library.col_name_to_index["only_if_story_keyword"]]
+                if self.trigger_by_keywords(row_skip_keyword, row_trigger_keyword, player_keywords):
                     scene_row = row
                     break
             
@@ -166,17 +161,22 @@ class DungeonMaster:
                           enemy = enemy_fighter,
                           next_scene = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
     
-    def create_story_scene(self, scene_row):        
-        option_1 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_1_text"]],
-                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_1_effect"]],
-                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
-        option_2 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_2_text"]],
-                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_2_effect"]],
-                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_2_next_scene"]])
-        option_3 = ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_3_text"]],
-                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_3_effect"]],
-                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_3_next_scene"]])
-        
+    def create_story_option(self, scene_row, option_index, player_keywords):
+        option_skip_keyword = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_skip_if"]]
+        option_trigger_keyword = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_only_if"]]
+    
+        print("creating option " + str(option_index))
+        if self.trigger_by_keywords(option_skip_keyword, option_trigger_keyword, player_keywords):
+            return ProgressionOption(option_text = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_text"]],
+                                     option_effect = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_effect"]],
+                                     option_next_scene = scene_row[self.scene_library.col_name_to_index["option_" + str(option_index) + "_next_scene"]])
+        else:
+            return None
+    
+    def create_story_scene(self, scene_row, player_keywords):          
+        option_1 = self.create_story_option(scene_row, 1, player_keywords)
+        option_2 = self.create_story_option(scene_row, 2, player_keywords)
+        option_3 = self.create_story_option(scene_row, 3, player_keywords)
         return StoryScene(program = self.game.program,
                           prompt = scene_row[self.scene_library.col_name_to_index["prompt"]],
                           option_1 = option_1,
@@ -187,7 +187,7 @@ class DungeonMaster:
         scene_row = self.find_scene_in_library(location_index, scene_index, player_keywords)
         
         if scene_row[self.scene_library.col_name_to_index["scene_type"]] == "story":
-            scene = self.create_story_scene(scene_row)
+            scene = self.create_story_scene(scene_row, player_keywords)
         elif scene_row[self.scene_library.col_name_to_index["scene_type"]] == "combat":
             scene = self.create_fight_scene(scene_row)
     

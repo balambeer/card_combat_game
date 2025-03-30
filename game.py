@@ -29,26 +29,29 @@ class Game:
             self.player = Player(program = self.program,
                                  hp = 3,
                                  max_stress = 7,
-                         card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                      (1, "shield"), (2, "shield"), (3, "shield"),
-                                      (1, "trump"), (2, "trump"), (3, "trump")],
-                         skill_list = [])
+                                 card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                              (1, "shield"), (2, "shield"), (3, "shield"),
+                                              (1, "trump"), (2, "trump"), (3, "trump")],
+                                 skill_list = [],
+                                 story_keywords = ["heretic"])
         elif self.select_character.thief_button.is_left_clicked():
             self.player = Player(program = self.program,
                          hp = 3,
                                  max_stress = 5,
-                         card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                      (1, "mana"), (2, "mana"), (3, "mana"),
-                                      (1, "trump"), (2, "trump"), (3, "trump")],
-                         skill_list = [])
+                                 card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
+                                              (1, "mana"), (2, "mana"), (3, "mana"),
+                                              (1, "trump"), (2, "trump"), (3, "trump")],
+                                 skill_list = [],
+                                 story_keywords = ["thief"])
         elif self.select_character.witch_button.is_left_clicked():
             self.player = Player(program = self.program,
                          hp = 3,
                                  max_stress = 5,
-                         card_list = [(1, "mana"), (2, "mana"), (3, "mana"),
-                                      (1, "shield"), (2, "shield"), (3, "shield"),
-                                      (1, "trump"), (2, "trump"), (3, "trump")],
-                         skill_list = [])
+                                 card_list = [(1, "mana"), (2, "mana"), (3, "mana"),
+                                              (1, "shield"), (2, "shield"), (3, "shield"),
+                                              (1, "trump"), (2, "trump"), (3, "trump")],
+                                 skill_list = [],
+                                 story_keywords = ["witch"])
             
     def resolve_scene_effect(self, effect):
         effect_type_and_value = effect.split(":")
