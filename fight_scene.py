@@ -82,7 +82,6 @@ class FightScene:
         if self.check_combat_over_condition():
             self.state = "scene_over"
         else:
-            self.program.game.delta_time = self.program.game.clock.tick(constants.fps)
             # manage players
             if self.fighter_1.state == "waiting" and self.fighter_2.state == "waiting":
                 if self.is_fighter_1_leading:

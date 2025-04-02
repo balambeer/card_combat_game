@@ -68,6 +68,8 @@ class Game:
             self.player.gain_skill(effect_type_and_value[1])
         
     def update(self):
+        self.delta_time = self.clock.tick(constants.fps)
+        
         if self.state == "select_character":
             self.assign_character()
 
@@ -79,7 +81,7 @@ class Game:
                 self.state = "encounter"
         elif self.state == "point_crawl":
             self.point_crawl.update()
-            if self.point_crawl.state == "next_node_selected":
+            if self.point_crawl.state == "arrived_at_new_location":
                 self.encounter = self.dungeon_master.create_scene(location_index = self.point_crawl.get_player_node().index,
                                                                   scene_index = 0,
                                                                   player_keywords = self.player.story_keywords)

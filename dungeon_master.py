@@ -89,9 +89,11 @@ class DungeonMaster:
                                                        row[self.point_crawl.col_name_to_index["position_y"]]))
             nodes.append(new_node)
             
+        for row in self.point_crawl.data:
+            node_index = row[self.point_crawl.col_name_to_index["location_index"]]
             for i in row[self.point_crawl.col_name_to_index["neighbor_nodes"]]:
                 if i > node_index:
-                    edges.append((node_index, i))
+                    edges.append(GraphEdge(nodes = (nodes[node_index], nodes[i]), junctions_list = []))
                     
         return Graph(nodes, edges)
     

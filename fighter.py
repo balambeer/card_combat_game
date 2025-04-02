@@ -264,14 +264,22 @@ class Fighter:
     def slide_cards(self, from_deck, to_deck, card_indexes, slide_v_per_ms):
         d = math.sqrt((to_deck.left - from_deck.left) ** 2 + (to_deck.top - from_deck.top) ** 2)
         n_steps = d / (slide_v_per_ms * 1000 / constants.fps)
-        v = support.XY(int((to_deck.left - from_deck.left) / n_steps),
-                       int((to_deck.top - from_deck.top) / n_steps))
+        v = (int((to_deck.left - from_deck.left) / n_steps),
+             int((to_deck.top - from_deck.top) / n_steps))
+#         angle = math.atan((to_deck.top - from_deck.top) / (to_deck.left - from_deck.left))
+#         v = (int(slide_v_per_ms * self.game.delta_time * math.cos(angle)),
+#              int(slide_v_per_ms * self.game.delta_time * math.sin(angle)))
+        
         for i in card_indexes:
-            new_left = from_deck.card_list[i].left + v.x
-            new_top = from_deck.card_list[i].top + v.y
-            if (new_left - to_deck.left) * (from_deck.left - to_deck.left) <= 0:
+            new_left = from_deck.card_list[i].left + v[0]
+            new_top = from_deck.card_list[i].top + v[1]
+#             if (new_left - to_deck.left) * (from_deck.left - to_deck.left) <= 0:
+            if ((new_left >= to_deck.left and from_deck.left <= to_deck.left) or
+                (new_left <= to_deck.left and from_deck.left >= to_deck.left)):
                 new_left = to_deck.left
-            if (new_top - to_deck.top) * (from_deck.top - to_deck.top) <= 0:
+#             if (new_top - to_deck.top) * (from_deck.top - to_deck.top) <= 0:
+            if ((new_top >= to_deck.top and from_deck.top <= to_deck.top) or
+                (new_top <= to_deck.top and from_deck.top >= to_deck.top)):
                 new_top = to_deck.top
             from_deck.card_list[i].update_position(new_left, new_top)
         

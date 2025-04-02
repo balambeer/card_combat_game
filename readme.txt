@@ -21,7 +21,8 @@ Implementation steps
 Systems:
 - rewards after combat
 - settings/options menu + rules description
-- animate point-crawl
+- add location names in point-crawl
+- remove support.XY and just use tuples
 - build vertical slice demo
 - redefine game structure (random encounters while traveling)
 
