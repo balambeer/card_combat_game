@@ -113,14 +113,17 @@ class PointCrawl:
                 else:
                     traveling_from = self.player_traveling_edge.junction_positions[-self.player_traveling_segment]
                     traveling_to = self.player_traveling_edge.junction_positions[-(self.player_traveling_segment + 1)]
-                d = math.sqrt((traveling_to[0] - traveling_from[0]) ** 2 + (traveling_to[1] - traveling_from[1]) ** 2)
-                n_steps = d / (point_crawl_player_v_per_ms * self.program.game.delta_time)
-                position_increment = ((traveling_to[0] - traveling_from[0]) / n_steps,
-                                      (traveling_to[1] - traveling_from[1]) / n_steps)
+#                 d = math.sqrt((traveling_to[0] - traveling_from[0]) ** 2 + (traveling_to[1] - traveling_from[1]) ** 2)
+#                 n_steps = d / (point_crawl_player_v_per_ms * self.program.game.delta_time)
+#                 position_increment = ((traveling_to[0] - traveling_from[0]) / n_steps,
+#                                       (traveling_to[1] - traveling_from[1]) / n_steps)
 
-#                 angle = math.atan((traveling_to[1] - traveling_from[1]) / (traveling_to[0] - traveling_from[0]))
-#                 v = point_crawl_player_v_per_ms * self.program.game.delta_time
-#                 position_increment = (int(v * math.cos(angle)), (v * math.sin(angle)))
+                angle = math.atan((traveling_to[1] - traveling_from[1]) / (traveling_to[0] - traveling_from[0]))
+                v = point_crawl_player_v_per_ms * self.program.game.delta_time
+                if traveling_to[0] >= traveling_from[0]:
+                    position_increment = (v * math.cos(angle), v * math.sin(angle))
+                else:
+                    position_increment = (-v * math.cos(angle), -v * math.sin(angle))
                 
                 self.player_position = (self.player_position[0] + position_increment[0],
                                         self.player_position[1] + position_increment[1])
