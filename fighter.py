@@ -59,11 +59,11 @@ class Fighter:
         return self.font.render("Def: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
         
     def set_hp_rect(self, is_left_player):
-        hp_rect_center_left = int(constants.player_hp_rect_center_ratio.x * constants.screen_width)
+        hp_rect_center_left = int(constants.player_hp_rect_center_ratio[0] * constants.screen_width)
         if not is_left_player:
             hp_rect_center_left = constants.screen_width - hp_rect_center_left
         return self.hp_rendered.get_rect(center = (hp_rect_center_left,
-                                                   int(constants.player_hp_rect_center_ratio.y * constants.screen_height)))
+                                                   int(constants.player_hp_rect_center_ratio[1] * constants.screen_height)))
     
     def set_defense_rect(self):
         return self.defense_rendered.get_rect(topleft = self.hp_rect.bottomleft)

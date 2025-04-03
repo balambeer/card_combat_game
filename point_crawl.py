@@ -1,6 +1,5 @@
 import pygame as pg
 import constants
-import support
 import math
 
 point_crawl_background_color = "burlywood"
@@ -19,8 +18,8 @@ point_crawl_font_size = int(constants.screen_height * 0.05)
 class GraphNode():
     # constructor
     def __init__(self, index, position, name_rendered):
-        self.rect = pg.Rect((position.x - point_crawl_node_size // 2,
-                             position.y - point_crawl_node_size // 2),
+        self.rect = pg.Rect((position[0] - point_crawl_node_size // 2,
+                             position[1] - point_crawl_node_size // 2),
                             (point_crawl_node_size, point_crawl_node_size))
         self.index = index
         self.name_rendered = name_rendered

@@ -1,6 +1,5 @@
 import pygame as pg
 import constants
-import support
 from card import *
 from deck import *
 from fighter import *

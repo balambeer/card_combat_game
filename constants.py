@@ -1,5 +1,3 @@
-import support
-
 ### Screen
 resolution = screen_width, screen_height = 1200, 650
 screen_half_width = screen_width // 2
@@ -19,9 +17,9 @@ card_width = int(card_width_to_screen * screen_width)
 card_height = int(card_height_to_width * card_width)
 
 # Proportional to card size
-card_suit_center = support.XY(0.18, 0.3)
+card_suit_center = (0.18, 0.3)
 card_suit_size = 0.13
-card_value_center = support.XY(0.18, 0.15)
+card_value_center = (0.18, 0.15)
 card_value_size_ratio = 0.2
 card_rounded_corner = 0.05
 card_back_border = 0.1
@@ -30,7 +28,7 @@ card_back_border = 0.1
 card_back_border_width = int(card_back_border * card_width)
 card_rounded_corner_size = int(card_rounded_corner * card_width)
 card_value_size = int(card_value_size_ratio * card_height)
-card_suit_dimensions = support.XY(int(card_suit_size * card_width), int(card_suit_size * card_height))
+card_suit_dimensions = (int(card_suit_size * card_width), int(card_suit_size * card_height))
 
 ### Deck
 deck_not_pile_shift = 0.5
@@ -71,7 +69,7 @@ player_character_animation_killing_blow_frame_count = 90
 
 player_hp_size_ratio = 0.1
 player_hp_size = int(player_hp_size_ratio * screen_height)
-player_hp_rect_center_ratio = support.XY(0.25, 0.35)
+player_hp_rect_center_ratio = (0.25, 0.35)
 
 player_damage_animation_length_in_ms = 1000
 player_damage_drift_v = int(0.5 * screen_height) / player_damage_animation_length_in_ms

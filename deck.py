@@ -2,7 +2,6 @@ import pygame as pg
 import random
 from card import *
 import constants
-import support
 
 class Deck:
     def __init__(self, game,

@@ -18,8 +18,3 @@ def slide_distortion(t, a):
         1 - 0.5 * a * (1 - t) * a * (1 - t)
     else:
         1
-
-class XY:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
