@@ -9,18 +9,22 @@ point_crawl_node_color = "gray"
 point_crawl_node_highlight_color = "orange"
 point_crawl_node_pressed_color = "tomato"
 point_crawl_player_color = "cornflowerblue"
+point_crawl_text_color = "black"
 point_crawl_node_size = int(0.1 * constants.screen_height)
 point_crawl_node_rounded_corner_size = int(0.1 * point_crawl_node_size)
 point_crawl_player_size = int(0.75 * point_crawl_node_size) // 2
 point_crawl_player_v_per_ms = constants.screen_height / 2000
+point_crawl_font_size = int(constants.screen_height * 0.05)
 
 class GraphNode():
     # constructor
-    def __init__(self, index, position):
+    def __init__(self, index, position, name_rendered):
         self.rect = pg.Rect((position.x - point_crawl_node_size // 2,
                              position.y - point_crawl_node_size // 2),
                             (point_crawl_node_size, point_crawl_node_size))
         self.index = index
+        self.name_rendered = name_rendered
+        self.name_rect = self.name_rendered.get_rect(midtop = self.rect.midbottom)
         
 class GraphEdge():
     def __init__(self, nodes, junctions_list):
@@ -89,6 +93,7 @@ class PointCrawl:
             node.rect.update((screen_pos[0] - point_crawl_node_size // 2,
                               screen_pos[1] - point_crawl_node_size // 2),
                              (point_crawl_node_size, point_crawl_node_size))
+            node.name_rect = node.name_rendered.get_rect(midtop = node.rect.midbottom)
             
         for edge in self.graph.edges:
             edge.junction_positions = [ self.convert_to_screen_position(position) for position in edge.junction_positions ]
@@ -185,6 +190,9 @@ class PointCrawl:
                          rect = node.rect,
                          width = 1,
                          border_radius = point_crawl_node_rounded_corner_size)
+            self.program.screen.blit(node.name_rendered,
+                                     node.name_rect)
+            
         # active node
         if not self.active_node_index is None:
             pg.draw.rect(surface = self.program.screen,

@@ -82,11 +82,15 @@ class DungeonMaster:
         nodes = []
         edges = []
         
+        point_crawl_font = pg.font.Font(None, point_crawl_font_size)
+        
         for row in self.point_crawl.data:
             node_index = row[self.point_crawl.col_name_to_index["location_index"]]
+            node_name = row[self.point_crawl.col_name_to_index["location_name"]]
             new_node = GraphNode(index = node_index,
                                  position = support.XY(row[self.point_crawl.col_name_to_index["position_x"]],
-                                                       row[self.point_crawl.col_name_to_index["position_y"]]))
+                                                       row[self.point_crawl.col_name_to_index["position_y"]]),
+                                 name_rendered = point_crawl_font.render(node_name, False, point_crawl_text_color))
             nodes.append(new_node)
             
         for row in self.point_crawl.data:
