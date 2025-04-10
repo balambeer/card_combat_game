@@ -3,6 +3,19 @@ import constants
 from card import *
 from deck import *
 from fighter import *
+from ui import *
+
+textbox_left = int(0.33 * constants.screen_width)
+textbox_top = int(0.33 * constants.screen_height)
+textbox_width = constants.screen_width - 2 * textbox_left
+textbox_height = constants.screen_height - 2 * textbox_top
+
+font_size = int(0.05 * constants.screen_height)
+
+textbox_color = "gray"
+text_color = "black"
+button_idle_color = "black"
+button_active_color = "white"
 
 class FightScene:
     # Constructor
@@ -23,12 +36,16 @@ class FightScene:
         self.fighter_1 = player
         self.fighter_2 = enemy
         
-    # Update game state
-    def check_combat_over_condition(self):
+        self.font = pg.font.Font(None, font_size)
+        self.rewards_rect = pg.Rect((textbox_left, textbox_top),
+                                    (textbox_width, textbox_height))
+        self.rewards_button = None
+            
+    def check_if_combat_over(self):
         a_player_died = self.fighter_1.hp <= 0 or self.fighter_2.hp <= 0
         final_animations_finished = self.fighter_1.character_animation_frame == 0 and self.fighter_2.character_animation_frame == 0
         
-        return a_player_died and final_animations_finished and pg.mouse.get_pressed()[0]
+        return a_player_died and final_animations_finished
     
     def determine_damage_and_next_leader(self, leading_card, following_card):
         if leading_card.suit == following_card.suit:
@@ -78,9 +95,7 @@ class FightScene:
     
     # need to pass keywords to match signature of story scene update
     def update(self, story_keywords):
-        if self.check_combat_over_condition():
-            self.state = "scene_over"
-        else:
+        if self.state == "ongoing":
             # manage players
             if self.fighter_1.state == "waiting" and self.fighter_2.state == "waiting":
                 if self.is_fighter_1_leading:
@@ -105,6 +120,20 @@ class FightScene:
             self.fighter_1.update(self.is_fighter_1_leading, fighter_2_card_played)
             self.fighter_2.update(not self.is_fighter_1_leading, fighter_1_card_played)
             
+            if self.check_if_combat_over():
+                self.rewards_button = Button(program = self.program,
+                                             center_position = (0.5, 0.5),
+                                             font = self.font,
+                                             text = "Continue",
+                                             background_color = textbox_color,
+                                             idle_color = button_idle_color,
+                                             active_color = button_active_color)
+                self.state = "combat_over"
+        if self.state == "combat_over":
+            if not self.rewards_button is None:
+                if self.rewards_button.is_left_clicked():
+                    self.state = "scene_over"
+            
         pg.display.set_caption(f'{self.program.game.clock.get_fps(): .1f}')
         
     # Update screen
@@ -121,5 +150,14 @@ class FightScene:
         self.draw_background()
         self.fighter_1.display()
         self.fighter_2.display()
+        if self.state == "combat_over":
+            pg.draw.rect(surface = self.program.screen,
+                         color = textbox_color,
+                         rect = self.rewards_rect)
+            pg.draw.rect(surface = self.program.screen,
+                         color = "black",
+                         rect = self.rewards_rect,
+                         width = 2)
+            self.rewards_button.draw()
 
         
