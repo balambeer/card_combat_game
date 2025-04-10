@@ -75,6 +75,7 @@ class DungeonMaster:
         self.scene_library = DataTable(self, "encounters/scene_library.csv")
         self.point_crawl = DataTable(self, "encounters/point_crawl.csv")
         self.monster_manual = DataTable(self, "encounters/monster_manual.csv")
+        self.travel_encounters = DataTable(self, "encounters/travel_encounters.csv")
         
         self.current_scene_index = None
         
@@ -86,11 +87,12 @@ class DungeonMaster:
         
         for row in self.point_crawl.data:
             node_index = row[self.point_crawl.col_name_to_index["location_index"]]
-            node_name = row[self.point_crawl.col_name_to_index["location_name"]]
-            new_node = GraphNode(index = node_index,
+            new_node = GraphNode(area = row[self.point_crawl.col_name_to_index["area_index"]],
+                                 index = node_index,
                                  position = (row[self.point_crawl.col_name_to_index["position_x"]],
                                              row[self.point_crawl.col_name_to_index["position_y"]]),
-                                 name_rendered = point_crawl_font.render(node_name, False, point_crawl_text_color))
+                                 name_rendered = point_crawl_font.render(row[self.point_crawl.col_name_to_index["location_name"]],
+                                                                         False, point_crawl_text_color))
             nodes.append(new_node)
             
         for row in self.point_crawl.data:
@@ -114,15 +116,15 @@ class DungeonMaster:
         else:
             return False
     
-    def find_scene_in_library(self, location_index, scene_index, player_keywords):
+    def find_scene_in_library(self, scene_library, location_index, scene_index, player_keywords):
         scene_row = None
         
-        for row in self.scene_library.data:
-            row_location_index = row[self.scene_library.col_name_to_index["location_index"]]
-            row_scene_index = row[self.scene_library.col_name_to_index["scene_index"]]
+        for row in scene_library.data:
+            row_location_index = row[scene_library.col_name_to_index["location_index"]]
+            row_scene_index = row[scene_library.col_name_to_index["scene_index"]]
             if (row_location_index == location_index and row_scene_index == scene_index):
-                row_skip_keyword = row[self.scene_library.col_name_to_index["skip_if_story_keyword"]]
-                row_trigger_keyword = row[self.scene_library.col_name_to_index["only_if_story_keyword"]]
+                row_skip_keyword = row[scene_library.col_name_to_index["skip_if_story_keyword"]]
+                row_trigger_keyword = row[scene_library.col_name_to_index["only_if_story_keyword"]]
                 if self.trigger_by_keywords(row_skip_keyword, row_trigger_keyword, player_keywords):
                     scene_row = row
                     break
@@ -202,14 +204,25 @@ class DungeonMaster:
                           option_2 = option_2,
                           option_3 = option_3)
     
-    def create_scene(self, location_index, scene_index, player_keywords):
-        scene_row = self.find_scene_in_library(location_index, scene_index, player_keywords)
+    def create_scene(self, scene_library, location_index, scene_index, player_keywords):
+        scene_row = self.find_scene_in_library(scene_library, location_index, scene_index, player_keywords)
         
-        if scene_row[self.scene_library.col_name_to_index["scene_type"]] == "story":
+        if scene_row[scene_library.col_name_to_index["scene_type"]] == "story":
             scene = self.create_story_scene(scene_row, player_keywords)
-        elif scene_row[self.scene_library.col_name_to_index["scene_type"]] == "combat":
+        elif scene_row[scene_library.col_name_to_index["scene_type"]] == "combat":
             scene = self.create_fight_scene(scene_row)
     
         return scene
+    
+    def create_travel_encounter_scene(self, area_index, player_keywords):
+        travel_encounter_indexes = []
+        for row in self.travel_encounters.data:
+            if row[self.travel_encounters.col_name_to_index["area_index"]] == area_index:
+                travel_encounter_indexes.append(row[self.travel_encounters.col_name_to_index["location_index"]])
+        
+        return self.create_scene(scene_library = self.travel_encounters,
+                                 location_index = random.choice(travel_encounter_indexes),
+                                 scene_index = 0,
+                                 player_keywords = player_keywords)
 
                     

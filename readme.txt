@@ -22,12 +22,11 @@ Systems:
 - rewards after combat
 - settings/options menu + rules description
 - build vertical slice demo
-- redefine game structure (random encounters while traveling)
+- new core cardplay mechanics
 
 Current stuff
 -------------
-- Redefine game structure
-  - Build a 3 node mini-setup
+- Core cardplay update
 
 Demo story outline
 ------------------

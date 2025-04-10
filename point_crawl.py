@@ -1,6 +1,7 @@
 import pygame as pg
 import constants
 import math
+import random
 
 point_crawl_background_color = "burlywood"
 point_crawl_edge_color = "black"
@@ -14,13 +15,15 @@ point_crawl_node_rounded_corner_size = int(0.1 * point_crawl_node_size)
 point_crawl_player_size = int(0.75 * point_crawl_node_size) // 2
 point_crawl_player_v_per_ms = constants.screen_height / 2000
 point_crawl_font_size = int(constants.screen_height * 0.05)
+point_crawl_travel_encounter_trigger_range = int(constants.screen_height * 0.025)
 
 class GraphNode():
     # constructor
-    def __init__(self, index, position, name_rendered):
+    def __init__(self, area, index, position, name_rendered):
         self.rect = pg.Rect((position[0] - point_crawl_node_size // 2,
                              position[1] - point_crawl_node_size // 2),
                             (point_crawl_node_size, point_crawl_node_size))
+        self.area = area
         self.index = index
         self.name_rendered = name_rendered
         self.name_rect = self.name_rendered.get_rect(midtop = self.rect.midbottom)
@@ -56,6 +59,7 @@ class PointCrawl:
         self.player_traveling_edge = None
         self.player_traveling_segment = None
         self.player_traveling_forward = None
+        self.travel_encounter_location = None
         
         self.state = "waiting_for_input"
         
@@ -147,11 +151,24 @@ class PointCrawl:
                 self.player_traveling_edge = None
                 self.player_traveling_segment = None
                 self.player_traveling_forward = None
+                self.travel_encounter_location = None
                 self.center_camera_on_player()
                 self.neighbor_node_indexes = self.find_neighbors()
                 self.state = "arrived_at_new_location"
             
+    def get_travel_encounter_location(self, area_index):
+        travel_encounter_prob = 1 / (1 + math.exp(-area_index))
+        
+        if (random.random() < travel_encounter_prob):
+            junction_index = self.player_traveling_edge.n_segments // 2
+            junction_1 = self.player_traveling_edge.junction_positions[junction_index]
+            junction_2 = self.player_traveling_edge.junction_positions[junction_index + 1]
+            self.travel_encounter_location = ((junction_1[0] + junction_2[0]) / 2,
+                                              (junction_1[1] + junction_2[1]) / 2)
+            
     def update(self):
+        if self.state == "arrived_at_new_location":
+            self.state = "waiting_for_input"
         if self.state == "waiting_for_input":
             self.active_node_index = None
             self.pressed_node_index = None
@@ -163,9 +180,18 @@ class PointCrawl:
                         self.player_traveling_edge = self.find_traveling_edge()
                         self.player_traveling_segment = 1
                         self.player_traveling_forward = (self.player_node_index == self.player_traveling_edge.node_indexes[0])
+                        self.get_travel_encounter_location(self.graph.nodes[self.pressed_node_index].area)
                         self.state = "traveling"
         elif self.state == "traveling":
             self.update_player_position()
+            if not self.travel_encounter_location is None:
+                if (abs(self.player_position[0] - self.travel_encounter_location[0]) <= point_crawl_travel_encounter_trigger_range and
+                    abs(self.player_position[1] - self.travel_encounter_location[1]) <= point_crawl_travel_encounter_trigger_range):
+                    self.travel_encounter_location = None
+                    self.state = "travel_encounter"            
+        elif self.state == "travel_encounter":
+            # This is only triggered when the encounter is resolved and we come back to point-crawl mode
+            self.state = "traveling"
         
     def draw(self):
         self.program.screen.fill(point_crawl_background_color)

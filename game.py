@@ -75,16 +75,22 @@ class Game:
 
             if not self.player is None:
                 self.select_character = None
-                self.encounter = self.dungeon_master.create_scene(location_index = self.point_crawl.get_player_node().index,
+                self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.scene_library,
+                                                                  location_index = self.point_crawl.get_player_node().index,
                                                                   scene_index = 0,
                                                                   player_keywords = self.player.story_keywords)
                 self.state = "encounter"
         elif self.state == "point_crawl":
             self.point_crawl.update()
             if self.point_crawl.state == "arrived_at_new_location":
-                self.encounter = self.dungeon_master.create_scene(location_index = self.point_crawl.get_player_node().index,
+                self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.scene_library,
+                                                                  location_index = self.point_crawl.get_player_node().index,
                                                                   scene_index = 0,
                                                                   player_keywords = self.player.story_keywords)
+                self.state = "encounter"
+            elif self.point_crawl.state == "travel_encounter":
+                self.encounter = self.dungeon_master.create_travel_encounter_scene(area_index = self.point_crawl.get_player_node().area,
+                                                                                   player_keywords = self.player.story_keywords)
                 self.state = "encounter"
         elif self.state == "encounter":
             self.encounter.update(self.player.story_keywords)
@@ -103,10 +109,10 @@ class Game:
                                                                              self.player.story_keywords)
                 if next_scene_index < 0:
                     self.state = "point_crawl"
-                    self.point_crawl.state = "waiting_for_input"
                     self.encounter = None
                 else:
-                    self.encounter = self.dungeon_master.create_scene(location_index = self.point_crawl.get_player_node().index,
+                    self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.scene_library,
+                                                                      location_index = self.point_crawl.get_player_node().index,
                                                                       scene_index = next_scene_index,
                                                                       player_keywords = self.player.story_keywords)
                 
