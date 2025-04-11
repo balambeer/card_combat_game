@@ -17,6 +17,56 @@ text_color = "black"
 button_idle_color = "black"
 button_active_color = "white"
 
+class TrickResolverSimple:
+    def __init__(self, fight_scene):
+        self.fight_scene = fight_scene
+        
+    def determine_damage_and_next_leader(self, leading_card, following_card):
+        if leading_card.suit == following_card.suit:
+            if leading_card.value > following_card.value:
+                return (0, self.fight_scene.is_fighter_1_leading)
+            else:
+                return (0, not self.fight_scene.is_fighter_1_leading)
+        else:
+            if following_card.suit == "trump":
+                return (following_card.value, not self.fight_scene.is_fighter_1_leading)
+            else:
+                return (leading_card.value, self.fight_scene.is_fighter_1_leading)
+            
+    def resolve_trick(self):
+        print("Trick Resolution:")
+        if self.fight_scene.is_fighter_1_leading:
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.fight_scene.fighter_1.play_area.card_list[0],
+                                                                         self.fight_scene.fighter_2.play_area.card_list[0])
+        else:
+            damage_and_next_lead = self.determine_damage_and_next_leader(self.fight_scene.fighter_2.play_area.card_list[0],
+                                                                         self.fight_scene.fighter_1.play_area.card_list[0])
+        
+        if self.fight_scene.is_fighter_1_leading:
+            if damage_and_next_lead[1]:
+                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
+                print("    player 1 leads next")
+                self.fight_scene.fighter_1.perform_attack(self.fight_scene.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
+                self.fight_scene.fighter_2.take_damage(damage_and_next_lead[0], False)
+            else:
+                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
+                print("    player 2 leads next")
+                self.fight_scene.fighter_2.perform_riposte(self.fight_scene.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
+                self.fight_scene.fighter_1.take_damage(damage_and_next_lead[0], True)
+                self.fight_scene.is_fighter_1_leading = not self.fight_scene.is_fighter_1_leading
+        else:
+            if not damage_and_next_lead[1]:
+                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
+                print("    player 2 leads next")
+                self.fight_scene.fighter_2.perform_attack(self.fight_scene.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
+                self.fight_scene.fighter_1.take_damage(damage_and_next_lead[0], False)
+            else:
+                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
+                print("    player 1 leads next")
+                self.fight_scene.fighter_1.perform_riposte(self.fight_scene.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
+                self.fight_scene.fighter_2.take_damage(damage_and_next_lead[0], True)
+                self.fight_scene.is_fighter_1_leading = not self.fight_scene.is_fighter_1_leading
+
 class FightScene:
     # Constructor
     def __init__(self, program,
@@ -29,6 +79,7 @@ class FightScene:
         self.scene_type = "fight"
         self.next_scene_options = next_scene_options
         self.effect = None
+        self.trick_resolver = TrickResolverSimple(self)
         
         self.is_fighter_1_leading = True
         self.trick_resolved = False
@@ -47,52 +98,6 @@ class FightScene:
         
         return a_player_died and final_animations_finished
     
-    def determine_damage_and_next_leader(self, leading_card, following_card):
-        if leading_card.suit == following_card.suit:
-            if leading_card.value > following_card.value:
-                return (0, self.is_fighter_1_leading)
-            else:
-                return (0, not self.is_fighter_1_leading)
-        else:
-            if following_card.suit == "trump":
-                return (following_card.value, not self.is_fighter_1_leading)
-            else:
-                return (leading_card.value, self.is_fighter_1_leading)
-    
-    def resolve_trick(self):
-        print("Trick Resolution:")
-        if self.is_fighter_1_leading:
-            damage_and_next_lead = self.determine_damage_and_next_leader(self.fighter_1.play_area.card_list[0],
-                                                                         self.fighter_2.play_area.card_list[0])
-        else:
-            damage_and_next_lead = self.determine_damage_and_next_leader(self.fighter_2.play_area.card_list[0],
-                                                                         self.fighter_1.play_area.card_list[0])
-        
-        if self.is_fighter_1_leading:
-            if damage_and_next_lead[1]:
-                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
-                print("    player 1 leads next")
-                self.fighter_1.perform_attack(self.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
-                self.fighter_2.take_damage(damage_and_next_lead[0], False)
-            else:
-                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
-                print("    player 2 leads next")
-                self.fighter_2.perform_riposte(self.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
-                self.fighter_1.take_damage(damage_and_next_lead[0], True)
-                self.is_fighter_1_leading = not self.is_fighter_1_leading
-        else:
-            if not damage_and_next_lead[1]:
-                print("    player 1 takes " + str(damage_and_next_lead[0]) + " damage")
-                print("    player 2 leads next")
-                self.fighter_2.perform_attack(self.fighter_1.damage_tolerance() <= damage_and_next_lead[0])
-                self.fighter_1.take_damage(damage_and_next_lead[0], False)
-            else:
-                print("    player 2 takes " + str(damage_and_next_lead[0]) + " damage")
-                print("    player 1 leads next")
-                self.fighter_1.perform_riposte(self.fighter_2.damage_tolerance() <= damage_and_next_lead[0])
-                self.fighter_2.take_damage(damage_and_next_lead[0], True)
-                self.is_fighter_1_leading = not self.is_fighter_1_leading            
-    
     # need to pass keywords to match signature of story scene update
     def update(self, story_keywords):
         if self.state == "ongoing":
@@ -107,7 +112,7 @@ class FightScene:
             elif self.fighter_1.state == "played_card" and self.fighter_2.state == "waiting":
                 self.fighter_2.state = "my_turn"
             elif self.fighter_1.state == "played_card" and self.fighter_2.state == "played_card":
-                self.resolve_trick()
+                self.trick_resolver.resolve_trick()
 
             if len(self.fighter_1.play_area.card_list) == 1:
                 fighter_1_card_played = self.fighter_1.play_area.card_list[0]
