@@ -14,35 +14,46 @@ utility_weight = 0.25
 
 def utility_when_leading(card):
     if card.suit == "trump":
-        suit_utility = 2
-    else:
         suit_utility = 1
-    return (suit_utility * card.value)
+    else:
+        suit_utility = 1.5
+    return (suit_utility * (4 - card.value))
 
 def utility_when_following(card, opponent_card):
     if opponent_card.suit == "trump":
         if card.suit == "trump":
             suit_utility = 1
-            if card.value > opponent_card.value:
+            if card.value < opponent_card.value:
                 value_utility = 1
             else:
-                value_utility = 0
+                value_utility = -1
+        elif card.suit == "shield":
+            suit_utility = 1
+            value_utility = card.value
         else:
             suit_utility = -1
             value_utility = card.value
     else:
         if card.suit == "trump":
-            suit_utility = 2
+            suit_utility = 1
             value_utility = card.value
         elif card.suit == opponent_card.suit:
-            suit_utility = 1
-            if card.value > opponent_card.value:
+            suit_utility = 2
+            if card.value < opponent_card.value:
                 value_utility = 1
             else:
-                value_utility = 3 - card.value
+                value_utility = -1
         else:
-            suit_utility = -1
-            value_utility = card.value
+            if opponent_card.suit == "spear" or opponent_card.suit == "trump":
+                if card.suit == "shield":
+                    suit_utility = 2
+                    value_utility = card.value
+                else:
+                    suit_utility = -1
+                    value_utility = 1
+            else:
+                suit_utility = -1
+                value_utility = 1
             
     return (suit_utility * value_utility)
     

@@ -31,6 +31,7 @@ class ProgressionOption:
 
 class StoryScene:
     def __init__(self, program,
+                 location_index,
                  prompt,
                  option_1,
                  option_2,
@@ -39,6 +40,7 @@ class StoryScene:
         
         self.state = "waiting_for_input"
         self.scene_type = "story"
+        self.scene_location = location_index
         self.next_scene_options = None
         self.effect = None
         

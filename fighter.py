@@ -7,6 +7,7 @@ from deck import *
 
 class Fighter:
     def __init__(self, game,
+                 name,
                  is_left_player,
                  is_human_controlled,
                  hp,
@@ -23,13 +24,20 @@ class Fighter:
         
         self.color = color
         self.hp = hp
-        self.defense = max_defense
+        self.defense = max_defense // 2
         self.max_defense = max_defense
+        self.fresh_conditions = []
+        self.waning_conditions = []
+        
         self.font = pg.font.Font(None, constants.player_hp_size)
         self.hp_rendered = self.render_hp() # self.font.render("HP: " + str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         self.defense_rendered = self.render_defense() # self.font.render("S: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
         self.defense_rect = self.set_defense_rect() # self.sress_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+        self.name_rendered = self.font.render(name, False, self.color)
+        self.name_rect = self.set_name_rect()
+        self.conditions_rendered = self.font.render("", False, self.color)
+        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.defense_rect.bottomleft)
         
         self.state = "clean_up"
         self.todo = "nothing"
@@ -37,6 +45,8 @@ class Fighter:
         self.damage_animation_clock = 0
         self.damage_rendered = self.font.render(str(0), False, self.color)
         self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
+        self.defense_boost_rendered = self.font.render(str(0), False, self.color)
+        self.defense_boost_rect = self.damage_rendered.get_rect(midbottom = self.defense_rect.midtop)
         
         self.character_animation_state = "idle"
         self.character_animation_frame = 0
@@ -48,33 +58,16 @@ class Fighter:
         self.hand = self.create_hand(self.is_left_player, show_hand)
         self.discard_pile = self.create_discard_pile(self.is_left_player)
         self.play_area = self.create_play_area(self.is_left_player)
-        
+     
+    ### Status
+     
     def damage_tolerance(self):
         return self.hp + self.defense
         
-    def render_hp(self):
-        return self.font.render("HP: " + str(self.hp), False, self.color)
-    
-    def render_defense(self):
-        return self.font.render("Def: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
+    def has_condition(self, condition):
+        return condition in self.fresh_conditions or condition in self.waning_conditions
         
-    def set_hp_rect(self, is_left_player):
-        hp_rect_center_left = int(constants.player_hp_rect_center_ratio[0] * constants.screen_width)
-        if not is_left_player:
-            hp_rect_center_left = constants.screen_width - hp_rect_center_left
-        return self.hp_rendered.get_rect(center = (hp_rect_center_left,
-                                                   int(constants.player_hp_rect_center_ratio[1] * constants.screen_height)))
-    
-    def set_defense_rect(self):
-        return self.defense_rendered.get_rect(topleft = self.hp_rect.bottomleft)
-    
-    def set_character_animation_rect(self):
-        if self.is_left_player:
-            character_animation_rect_x = constants.player_left_character_animation_center_x
-        else:
-            character_animation_rect_x = constants.player_right_character_animation_center_x
-        character_animation_rect_y = constants.player_character_animation_center_y
-        return self.character_animation_rendered.get_rect(center = (character_animation_rect_x, character_animation_rect_y))
+    ### Deck creation
 
     def create_draw_deck(self, card_list, is_left_player):
         if is_left_player:
@@ -92,6 +85,7 @@ class Fighter:
             card = Card(game = self.game,
                         value = card_params[0],
                         suit = card_params[1],
+                        special = card_params[2],
                         color_back = self.color,
                         clickable = False,
                         draggable = False,
@@ -141,6 +135,50 @@ class Fighter:
                     face_up = show_hand,
                     is_pile = False)
     
+    ### Display
+    
+    def render_hp(self):
+        return self.font.render("HP: " + str(self.hp), False, self.color)
+    
+    def render_defense(self):
+        return self.font.render("Def: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
+        
+    def render_conditions(self):
+        conditions = self.fresh_conditions + self.waning_conditions
+        conditions_string = ""
+        for i in range(len(conditions)):
+            if i < len(conditions) - 1:
+                conditions_string += (conditions[i] + ", ")
+            else:
+                conditions_string += conditions[i]
+        self.conditions_rendered = self.font.render(conditions_string, False, self.color)
+        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.defense_rect.bottomleft)
+        
+    def set_hp_rect(self, is_left_player):
+        hp_rect_center_left = int(constants.player_hp_rect_center_ratio[0] * constants.screen_width)
+        if not is_left_player:
+            hp_rect_center_left = constants.screen_width - hp_rect_center_left
+        return self.hp_rendered.get_rect(center = (hp_rect_center_left,
+                                                   int(constants.player_hp_rect_center_ratio[1] * constants.screen_height)))
+    
+    def set_defense_rect(self):
+        return self.defense_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+    
+    def set_name_rect(self):
+        return self.name_rendered.get_rect(bottomleft = self.hp_rect.topleft)
+    
+    def set_character_animation_rect(self):
+        if self.is_left_player:
+            character_animation_rect_x = constants.player_left_character_animation_center_x
+        else:
+            character_animation_rect_x = constants.player_right_character_animation_center_x
+        character_animation_rect_y = constants.player_character_animation_center_y
+        return self.character_animation_rendered.get_rect(center = (character_animation_rect_x, character_animation_rect_y))
+
+    
+    def display_name(self):
+        self.game.program.screen.blit(self.name_rendered, self.name_rect)
+    
     def display_hp_and_defense(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
         self.game.program.screen.blit(self.defense_rendered, self.defense_rect)
@@ -157,17 +195,24 @@ class Fighter:
         self.character_animation_rect.update(self.character_animation_rendered.get_rect(center = self.character_animation_rect.center))
         self.game.program.screen.blit(self.character_animation_rendered, self.character_animation_rect)
         
+    def display_conditions(self):
+        self.game.program.screen.blit(self.conditions_rendered, self.conditions_rect)
+        
     def display(self):
         self.draw_deck.draw()
         self.hand.draw()
         self.discard_pile.draw()
         self.play_area.draw()
         self.display_character()
+        self.display_name()
         self.display_hp_and_defense()
+        self.display_conditions()
         if self.damage_animation_clock > 0:
             self.damage_animation_clock -= self.game.delta_time
             self.display_damage()
-                
+        
+    ### Update
+        
     def listen_to_card_played(self):
         self.hand.update()
         if not self.hand.selected_card_index is None:
@@ -209,6 +254,29 @@ class Fighter:
                 self.ai_card_index = None
         else:
             self.ai_timer -= self.game.delta_time
+            
+    ### Animation
+                
+    def perform_defend(self, defense_boost):
+        defense_boost_capped = min(defense_boost, self.max_defense - self.defense)
+        self.defense = self.defense + defense_boost_capped
+        self.defense_rendered = self.render_defense()
+        self.defense_rect = self.set_defense_rect()
+        
+        self.defense_boost_animation_clock = constants.player_defense_boost_animation_length_in_ms
+        self.defense_boost_rendered = self.font.render(str(defense_boost_capped), False, self.color)
+        self.defense_boost_rect = self.defense_boost_rendered.get_rect(midbottom = self.defense_rect.midtop)
+    
+        self.character_animation_state = "defend"
+        self.character_animation_frame = constants.player_character_animation_defend_frame_count
+        
+    def perform_cast(self):
+        self.character_animation_state = "cast"
+        self.character_animation_frame = constants.player_character_animation_cast_frame_count
+        
+    def perform_flatfooted(self):
+        self.character_animation_state = "flat_footed"
+        self.character_animation_frame = constants.player_character_animation_flatfooted_frame_count
                 
     def perform_attack(self, is_killing_blow):
         if not is_killing_blow:
@@ -227,6 +295,8 @@ class Fighter:
     def perform_killing_blow(self):
         self.character_animation_state = "killing_blow"
         self.character_animation_frame = constants.player_character_animation_killing_blow_frame_count
+                
+    ### Combat interactions
                 
     def take_damage(self, damage, was_riposte):
         defense_damage = min(damage, self.defense)
@@ -260,6 +330,12 @@ class Fighter:
             else:
                 self.character_animation_state = "blocked"
                 self.character_animation_frame = constants.player_character_animation_blocked_frame_count
+        
+    def gain_condition(self, condition):
+        self.fresh_conditions.append(condition)
+        self.render_conditions()
+        
+    ### card handling
         
     def slide_cards(self, from_deck, to_deck, card_indexes, slide_v_per_ms):
         d = math.sqrt((to_deck.left - from_deck.left) ** 2 + (to_deck.top - from_deck.top) ** 2)
@@ -299,7 +375,7 @@ class Fighter:
                 card.flip()
                 self.play_area.remove_card(card)
                 self.discard_pile.add_card(card)
-            self.todo_clear_play_area = False
+            self.todo = "nothing"
             
     def replenish_draw_deck(self):
         self.slide_cards(from_deck = self.discard_pile,
@@ -316,7 +392,7 @@ class Fighter:
             self.draw_deck.set_deck_rect()
             self.discard_pile.set_card_positions()
             self.discard_pile.set_deck_rect()
-            self.todo_replenish_draw_deck = False
+            self.todo = "nothing"
         
     def draw_a_card_to_hand(self):
         self.slide_cards(from_deck = self.draw_deck,
@@ -334,22 +410,29 @@ class Fighter:
             if self.is_human_controlled:
                 card.draggable = True
             self.hand.add_card(card)
-            self.todo_draw_a_card_to_hand = False
+            self.todo  = "nothing"
+        
+    ### Update
         
     def update_todo_list(self):
         if self.state == "clean_up":
             if not self.play_area.is_empty():
                 self.todo = "clear_play_area"
-            elif len(self.hand.card_list) < constants.player_hand_size:
-                if not self.draw_deck.is_empty():
-                    self.todo = "draw_a_card_to_hand"
-                elif not self.discard_pile.is_empty():
-                    self.todo = "replenish_draw_deck"
-            else:
+            elif self.hand.is_empty():
+                self.state = "replenish_hand"
+        
+        if self.state == "replenish_hand":
+            if len(self.hand.card_list) == constants.player_hand_size:
                 self.todo = "nothing"
-                
-            if self.todo == "nothing":
-                self.state = "waiting"
+            elif not self.draw_deck.is_empty():
+                self.todo = "draw_a_card_to_hand"
+            elif not self.discard_pile.is_empty():
+                self.todo = "replenish_draw_deck"
+            else:
+                raise Exception("Hand limit not reached, but no more cards to draw.")
+            
+        if self.todo == "nothing":
+            self.state = "waiting"
                 
     def update_character(self, is_leading_player):
         if self.character_animation_frame == 0:
@@ -361,6 +444,11 @@ class Fighter:
                 self.character_animation_frame = constants.player_character_animation_idle_frame_count
         else:
             self.character_animation_frame -= 1
+            
+    def update_conditions(self):
+        self.waning_conditions = self.fresh_conditions
+        self.fresh_conditions = []
+        self.render_conditions()
         
     def update(self, is_leading_player, opponent_card_played):
         self.update_character(is_leading_player)
@@ -375,12 +463,17 @@ class Fighter:
         elif self.state == "animating":
             if self.character_animation_state == "idle_active" or self.character_animation_state == "idle_passive":
                 self.state = "clean_up"
-        elif self.state == "clean_up":
+        elif self.state == "clean_up" or self.state == "replenish_hand":
             self.update_todo_list()
             if self.todo == "clear_play_area":
-                self.clear_play_area()
+                self.clear_play_area()          
             elif self.todo == "replenish_draw_deck":
                 self.replenish_draw_deck()
+                if self.todo == "nothing": # means that the card animation finished
+                    if self.has_condition("poisoned"):
+                        # TODO: this probably won't work
+                        self.take_damage(1, False)
+                    self.update_conditions()
             elif self.todo == "draw_a_card_to_hand":
                 self.draw_a_card_to_hand()
         

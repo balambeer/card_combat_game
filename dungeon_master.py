@@ -34,8 +34,12 @@ class DataTable:
         card_list = stripped_string.split(";")
         
         def process_card(card_string):
-            value_and_suit = card_string.strip("()").split(",")
-            return (int(value_and_suit[0]), value_and_suit[1])
+            card_parameters = card_string.strip("()").split(",")
+            if card_parameters[2] == "":
+                card_special = None
+            else:
+                card_special = card_parameters[2]
+            return (int(card_parameters[0]), card_parameters[1], card_special)
         
         return [ process_card(x) for x in card_list ]
     
@@ -143,6 +147,7 @@ class DungeonMaster:
     def create_enemy_fighter(self, monster_row):                
         if not monster_row is None:
             return Fighter(game = self.game,
+                           name = monster_row[self.monster_manual.col_name_to_index["monster_name"]],
                            is_left_player = False,
                            is_human_controlled = False,
                            hp = monster_row[self.monster_manual.col_name_to_index["hp"]],
@@ -167,6 +172,7 @@ class DungeonMaster:
         
     def create_fight_scene(self, scene_row):
         player_fighter = Fighter(game = self.game,
+                                 name = self.game.player.name,
                                  is_left_player = True,
                                  is_human_controlled = True,
                                  hp = self.game.player.hp,
@@ -179,6 +185,7 @@ class DungeonMaster:
         enemy_fighter = self.create_enemy_fighter(monster_row)
         
         return FightScene(self.game.program,
+                          location_index = scene_row[self.scene_library.col_name_to_index["location_index"]],
                           player = player_fighter,
                           enemy = enemy_fighter,
                           next_scene_options = scene_row[self.scene_library.col_name_to_index["option_1_next_scene"]])
@@ -199,6 +206,7 @@ class DungeonMaster:
         option_2 = self.create_story_option(scene_row, 2, player_keywords)
         option_3 = self.create_story_option(scene_row, 3, player_keywords)
         return StoryScene(program = self.game.program,
+                          location_index = scene_row[self.scene_library.col_name_to_index["location_index"]],
                           prompt = scene_row[self.scene_library.col_name_to_index["prompt"]],
                           option_1 = option_1,
                           option_2 = option_2,

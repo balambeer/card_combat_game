@@ -2,6 +2,7 @@ import pygame as pg
 
 class Player:
     def __init__(self, program,
+                 name,
                  hp,
                  max_defense,
                  card_list,
@@ -9,6 +10,7 @@ class Player:
                  story_keywords):
         self.program = program
         
+        self.name = name
         self.hp = hp
         self.max_defense = max_defense
         self.card_list = card_list

@@ -5,4 +5,4 @@
 0,0,3,"story",NA,"the gate of Ithar","entered_gate",NA,"You climb through the wall.",NA,NA,"Continue","gain_keyword:entered_gate","[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 0,0,4,"story",NA,"the gate of Ithar","entered_gate",NA,"You smash down the closed gate.",NA,NA,"Continue","gain_keyword:entered_gate","[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 0,0,0,"story",NA,"the gate of Ithar",NA,"entered_gate","You return to the gate but find it closed. You seem to have no choice but to keep pushing forward.",NA,NA,"Continue",NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-0,1,0,"combat","monster1","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,1,0,"combat","giant_spider","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

@@ -27,29 +27,38 @@ class Game:
     def assign_character(self):
         if self.select_character.heretic_button.is_left_clicked():
             self.player = Player(program = self.program,
+                                 name = "heretic",
                                  hp = 3,
                                  max_defense = 7,
-                                 card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                              (1, "shield"), (2, "shield"), (3, "shield"),
-                                              (1, "trump"), (2, "trump"), (3, "trump")],
+#                                  card_list = [(1, "spear", None), (2, "spear", None), (3, "spear", None),
+#                                               (1, "shield", None), (2, "shield", None), (3, "shield", None),
+#                                               (1, "trump", None), (2, "trump", None), (3, "trump", None)],
+                                 card_list = [(1, "spear", None), (2, "spear", None), (3, "spear", None),
+                                              (1, "shield", None), (2, "shield", None),
+                                              (1, "trump", None), (2, "trump", None),
+                                              (3, "mana", "rage")],
                                  skill_list = [],
                                  story_keywords = ["heretic"])
         elif self.select_character.thief_button.is_left_clicked():
             self.player = Player(program = self.program,
-                         hp = 3,
+                                 name = "thief",
+                                 hp = 3,
                                  max_defense = 5,
-                                 card_list = [(1, "spear"), (2, "spear"), (3, "spear"),
-                                              (1, "mana"), (2, "mana"), (3, "mana"),
-                                              (1, "trump"), (2, "trump"), (3, "trump")],
+                                 card_list = [(1, "shield", None), (2, "spear", None),
+                                              (1, "shield", None), (2, "shield", None), (3, "shield", None),
+                                              (2, "mana", "hide"),
+                                              (1, "trump", None), (1, "trump", None)],
                                  skill_list = [],
                                  story_keywords = ["thief"])
         elif self.select_character.witch_button.is_left_clicked():
             self.player = Player(program = self.program,
-                         hp = 3,
+                                 name = "witch",
+                                 hp = 3,
                                  max_defense = 5,
-                                 card_list = [(1, "mana"), (2, "mana"), (3, "mana"),
-                                              (1, "shield"), (2, "shield"), (3, "shield"),
-                                              (1, "trump"), (2, "trump"), (3, "trump")],
+                                 card_list = [(2, "mana", "mage armor"), (2, "mana", "weakness"), (1, "mana", "bolt"),
+                                              (1, "shield", None), (2, "shield", None),
+                                              (1, "spear", None),
+                                              (1, "trump", None), (2, "trump", None)],
                                  skill_list = [],
                                  story_keywords = ["witch"])
             
@@ -91,8 +100,8 @@ class Game:
             elif self.point_crawl.state == "travel_encounter":
                 self.encounter = self.dungeon_master.create_travel_encounter_scene(area_index = self.point_crawl.get_player_node().area,
                                                                                    player_keywords = self.player.story_keywords)
-                self.state = "encounter"
-        elif self.state == "encounter":
+                self.state = "travel_encounter"
+        elif self.state == "encounter" or self.state == "travel_encounter":
             self.encounter.update(self.player.story_keywords)
             if self.encounter.state == "scene_over":
                 if self.encounter.scene_type == "fight":
@@ -101,20 +110,27 @@ class Game:
                     else:
                         self.player.hp = self.encounter.fighter_1.hp
                         
-                if not self.encounter.effect is None:
-                    print("resolving encounter effect")
-                    self.resolve_scene_effect(self.encounter.effect)
-                
-                next_scene_index = self.dungeon_master.find_next_scene_index(self.encounter.next_scene_options,
-                                                                             self.player.story_keywords)
-                if next_scene_index < 0:
-                    self.state = "point_crawl"
-                    self.encounter = None
-                else:
-                    self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.scene_library,
-                                                                      location_index = self.point_crawl.get_player_node().index,
-                                                                      scene_index = next_scene_index,
-                                                                      player_keywords = self.player.story_keywords)
+                if not self.state == "game_over":
+                    if not self.encounter.effect is None:
+                        print("resolving encounter effect")
+                        self.resolve_scene_effect(self.encounter.effect)
+                    
+                    next_scene_index = self.dungeon_master.find_next_scene_index(self.encounter.next_scene_options,
+                                                                                 self.player.story_keywords)
+                    if next_scene_index < 0:
+                        self.state = "point_crawl"
+                        self.encounter = None
+                    elif self.state == "encounter":
+                        self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.scene_library,
+                                                                          location_index = self.encounter.scene_location, # self.point_crawl.get_player_node().index,
+                                                                          scene_index = next_scene_index,
+                                                                          player_keywords = self.player.story_keywords)
+                    elif self.state == "travel_encounter":
+                        self.encounter = self.dungeon_master.create_scene(scene_library = self.dungeon_master.travel_encounters,
+                                                                          # I need the location which was selected upon creation of the travel encounter
+                                                                          location_index = self.encounter.scene_location, # 0,
+                                                                          scene_index = next_scene_index,
+                                                                          player_keywords = self.player.story_keywords)
                 
     def draw(self):
         pg.display.flip()
@@ -122,6 +138,6 @@ class Game:
             self.select_character.draw()
         elif self.state == "point_crawl":
             self.point_crawl.draw()
-        elif self.state == "encounter":
+        elif self.state == "encounter" or self.state == "travel_encounter":
             self.encounter.draw()
     

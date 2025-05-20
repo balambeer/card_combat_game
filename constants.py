@@ -44,7 +44,7 @@ player_ai_delay = 1000
 
 player_deck_margin_ratio = 0.05
 player_deck_margin = int(player_deck_margin_ratio * screen_width)
-player_hand_size = 3
+player_hand_size = 4
 player_hand_and_draw_deck_buffer_ratio = 0.05
 player_hand_and_draw_deck_buffer = int(player_hand_and_draw_deck_buffer_ratio * screen_width)
 player_left_draw_deck_left = player_deck_margin
@@ -66,10 +66,15 @@ player_character_animation_riposte_pain_frame_count = 60
 player_character_animation_riposte_blocked_frame_count = 60
 player_character_animation_death_frame_count = 90
 player_character_animation_killing_blow_frame_count = 90
+player_character_animation_defend_frame_count = 30
+player_character_animation_cast_frame_count = 30
+player_character_animation_flatfooted_frame_count = 30
 
-player_hp_size_ratio = 0.1
+player_hp_size_ratio = 0.05
 player_hp_size = int(player_hp_size_ratio * screen_height)
-player_hp_rect_center_ratio = (0.25, 0.35)
+player_hp_rect_center_ratio = (0.1, 0.4)
 
 player_damage_animation_length_in_ms = 1000
 player_damage_drift_v = int(0.5 * screen_height) / player_damage_animation_length_in_ms
+player_defense_boost_animation_length_in_ms = 1000
+player_defense_boost_drift_v = int(0.5 * screen_height) / player_defense_boost_animation_length_in_ms

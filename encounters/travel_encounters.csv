@@ -1,2 +1,7 @@
 "area_index-int","location_index-int","scene_index-int","scene_type-str","monster_name-str","location_name-str","skip_if_story_keyword-str","only_if_story_keyword-str","prompt-str","option_1_only_if-str","option_1_skip_if-str","option_1_text-str","option_1_effect-str","option_1_next_scene-str","option_2_only_if-str","option_2_skip_if-str","option_2_text-str","option_2_effect-str","option_2_next_scene-str","option_3_only_if-str","option_3_skip_if-str","option_3_text-str","option_3_effect-str","option_3_next_scene-str"
-0,0,0,"combat","monster1","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,0,0,"story",NA,"streets of Ithar",NA,NA,"A walking corpse blocks your path forward.",NA,NA,"Continue",NA,"[1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,0,1,"combat","zombie","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,1,0,"story",NA,"streets of Ithar",NA,NA,"A giant spider jumps out in front of you.",NA,NA,"Continue",NA,"[1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,1,1,"combat","giant_spider","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,2,0,"story",NA,"streets of Ithar",NA,NA,"You hear a chilling wail and a spectre drifts out from the side-wall of the alley.",NA,NA,"Continue",NA,"[1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+0,2,1,"combat","banshee","streets of Ithar",NA,NA,NA,NA,NA,NA,NA,"[-1]",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

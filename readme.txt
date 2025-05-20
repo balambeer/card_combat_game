@@ -17,16 +17,16 @@ Implementation steps
 - appearance: change colors, background, add sprites & animations for combatants, change card suits
 - readability: animate trick resolution (mark leading card?, mark winning card?)
 - juice: sound effects, music, camerea shake, particle effects etc...
+- rethink animations (maybe have dodge instead of riposte in some cases)
 
 Systems:
 - rewards after combat
-- settings/options menu + rules description
+- settings/options menu + rules description (toggler between AI controlled and human controlled opponents)
 - build vertical slice demo
-- new core cardplay mechanics
 
 Current stuff
 -------------
-- Core cardplay update
+
 
 Demo story outline
 ------------------
