@@ -232,7 +232,7 @@ class TrickResolverActions:
             defense = max(1, winning_card.value // 2)
             self.designate_defend_actions(did_fighter_1_win_trick, defense)
         elif winning_card.suit == "mana":
-            spell_name = winning_card.special
+            spell_name = winning_card.effect
             self.designate_casting_actions(did_fighter_1_win_trick, spell_name)
         elif winning_card.suit == "trump":
             if leading_player_won_trick:

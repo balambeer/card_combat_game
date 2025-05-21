@@ -85,7 +85,7 @@ class Fighter:
             card = Card(game = self.game,
                         value = card_params[0],
                         suit = card_params[1],
-                        special = card_params[2],
+                        effect = card_params[2],
                         color_back = self.color,
                         clickable = False,
                         draggable = False,

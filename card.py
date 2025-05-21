@@ -5,7 +5,7 @@ class Card():
     def __init__(self, game,
                  value,
                  suit,
-                 special,
+                 effect,
                  color_back,
                  clickable,
                  draggable,
@@ -23,7 +23,7 @@ class Card():
         
         self.value = value
         self.suit = suit
-        self.special = special
+        self.effect = effect
         self.value_numeric = self.convert_value_to_numeric()
         self.face_up = face_up
         
@@ -34,37 +34,37 @@ class Card():
         self.value_rect = self.value_rendered.get_rect(center = (int(self.left + constants.card_value_center[0] * constants.card_width),
                                                                  int(self.top + constants.card_value_center[1] * constants.card_height)))
         
-        self.special_rendered_list = self.render_special(self.special)
-        self.special_rect_list = self.set_special_rects()
+        self.effect_rendered_list = self.render_effect(self.effect)
+        self.effect_rect_list = self.set_effect_rects()
         
         self.clickable = clickable
         self.draggable = draggable
         self.pressed = False
         self.pressed_pos = (self.left, self.top)
         
-    def render_special(self, special):
-        if not special is None:
-            special_words = special.split(" ")
+    def render_effect(self, effect):
+        if not effect is None:
+            effect_words = effect.split(" ")
             rendered_list = []
-            for word in special_words:
+            for word in effect_words:
                 rendered_list.append(self.font.render(word, False, self.color))
             return rendered_list
         else:
             return None
             
-    def set_special_rects(self):
-        if not self.special_rendered_list is None:
-            n_words = len(self.special_rendered_list)
+    def set_effect_rects(self):
+        if not self.effect_rendered_list is None:
+            n_words = len(self.effect_rendered_list)
             if n_words == 1:
-                return [ self.special_rendered_list[0].get_rect(center = self.card_rect.center) ]
+                return [ self.effect_rendered_list[0].get_rect(center = self.card_rect.center) ]
             elif n_words == 2:
-                return [ self.special_rendered_list[0].get_rect(midbottom = self.card_rect.center),
-                         self.special_rendered_list[1].get_rect(midtop = self.card_rect.center) ]
+                return [ self.effect_rendered_list[0].get_rect(midbottom = self.card_rect.center),
+                         self.effect_rendered_list[1].get_rect(midtop = self.card_rect.center) ]
             elif n_words == 3:
-                middle_word_rect = self.special_rendered_list[1].get_rect(center = self.card_rect.center)
-                return [ self.special_rendered_list[0].get_rect(midbottom = middle_word_rect.midtop),
+                middle_word_rect = self.effect_rendered_list[1].get_rect(center = self.card_rect.center)
+                return [ self.effect_rendered_list[0].get_rect(midbottom = middle_word_rect.midtop),
                          middle_word_rect,
-                         self.special_rendered_list[2].get_rect(midtop = middle_word_rect.midbottom) ]
+                         self.effect_rendered_list[2].get_rect(midtop = middle_word_rect.midbottom) ]
             else:
                 raise Exception("Don't support spells with more than 3 words")
         else:
@@ -170,10 +170,10 @@ class Card():
                             int(self.top + (constants.card_suit_center[1] - constants.card_suit_size / 2) * constants.card_height))
             self.draw_suit(suit_topleft)
             
-            # special
-            if not self.special_rendered_list is None:
-                for i in range(len(self.special_rendered_list)):
-                    self.game.program.screen.blit(self.special_rendered_list[i], self.special_rect_list[i])
+            # effect
+            if not self.effect_rendered_list is None:
+                for i in range(len(self.effect_rendered_list)):
+                    self.game.program.screen.blit(self.effect_rendered_list[i], self.effect_rect_list[i])
         else:
             pg.draw.rect(surface = self.game.program.screen,
                      color = self.color_back,
@@ -210,17 +210,17 @@ class Card():
                                   constants.card_height - 2 * constants.card_back_border_width))
         self.value_rect.update(self.value_rendered.get_rect(center = (int(self.left + constants.card_value_center[0] * constants.card_width),
                                                                       int(self.top + constants.card_value_center[1] * constants.card_height))))
-        if not self.special_rendered_list is None:
-            n_words = len(self.special_rendered_list)
+        if not self.effect_rendered_list is None:
+            n_words = len(self.effect_rendered_list)
             if n_words == 1:
-                self.special_rect_list[0].update(self.special_rendered_list[0].get_rect(center = self.card_rect.center))
+                self.effect_rect_list[0].update(self.effect_rendered_list[0].get_rect(center = self.card_rect.center))
             elif n_words == 2:
-                self.special_rect_list[0].update(self.special_rendered_list[0].get_rect(midbottom = self.card_rect.center))
-                self.special_rect_list[1].update(self.special_rendered_list[1].get_rect(midtop = self.card_rect.center))
+                self.effect_rect_list[0].update(self.effect_rendered_list[0].get_rect(midbottom = self.card_rect.center))
+                self.effect_rect_list[1].update(self.effect_rendered_list[1].get_rect(midtop = self.card_rect.center))
             elif n_words == 3:
-                self.special_rect_list[1].update(self.special_rendered_list[1].get_rect(center = self.card_rect.center))
-                self.special_rect_list[0].update(self.special_rendered_list[0].get_rect(midbottom = self.special_rect_list[1].midtop))
-                self.special_rect_list[2].update(self.special_rendered_list[2].get_rect(midtop = self.special_rect_list[1].midbottom))
+                self.effect_rect_list[1].update(self.effect_rendered_list[1].get_rect(center = self.card_rect.center))
+                self.effect_rect_list[0].update(self.effect_rendered_list[0].get_rect(midbottom = self.effect_rect_list[1].midtop))
+                self.effect_rect_list[2].update(self.effect_rendered_list[2].get_rect(midtop = self.effect_rect_list[1].midbottom))
             else:
                 raise Exception("Don't support more than 3 word spells")
     

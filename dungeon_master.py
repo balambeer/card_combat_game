@@ -36,10 +36,10 @@ class DataTable:
         def process_card(card_string):
             card_parameters = card_string.strip("()").split(",")
             if card_parameters[2] == "":
-                card_special = None
+                card_effect = None
             else:
-                card_special = card_parameters[2]
-            return (int(card_parameters[0]), card_parameters[1], card_special)
+                card_effect = card_parameters[2]
+            return (int(card_parameters[0]), card_parameters[1], card_effect)
         
         return [ process_card(x) for x in card_list ]
     
