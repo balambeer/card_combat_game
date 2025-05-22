@@ -60,11 +60,9 @@ class Deck:
                      rect = self.deck_rect,
                      width = 2)
         for i in range(self.n_cards_to_display):
-            if not self.active_card_index == i:
-                self.card_list[i].draw()
-        if not self.active_card_index == None:
-            self.card_list[self.active_card_index].draw()
-            self.card_list[self.active_card_index].highlight()
+            self.card_list[i].draw()
+            if self.active_card_index == i:
+                self.card_list[i].highlight()
 
     def add_card(self, card):
         if self.face_up:
