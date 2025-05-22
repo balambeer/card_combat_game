@@ -1,0 +1,10 @@
+Start:
+
+"Dry leaves crunch under your boots as you hop down on the other side of the wall. Back to this cursed place again, fethcing some trinket for that noblewoman. Alida. Or Alina. Or something similar. The bulging features under her cloak kept most of your attention. That purse must have contained enough to not have to do this again for months."
+
+"You quickly swat away the thoughts of hot meals and a comfortable bed. You have a job to do, and you're in dangerous territory. Monsters lurking in every dark alley, eyes peeking through every ruined window. You press on in search of the ancient family estate of that noblewoman."
+
+"The mansion should be somewhere on Aldale street, signified by the family crest of a chimera above the door. You're not sure yet how you're going to get into the vault. If you're lucky, though the door rusted away over the years. Yeah, right."
+
+- for the thief, this last paragraph should be different, he can open the vault.
+
