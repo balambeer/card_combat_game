@@ -33,10 +33,10 @@ class Game:
 #                                  card_list = [(1, "spear", None), (2, "spear", None), (3, "spear", None),
 #                                               (1, "shield", None), (2, "shield", None), (3, "shield", None),
 #                                               (1, "trump", None), (2, "trump", None), (3, "trump", None)],
-                                 card_list = [(1, "spear", None), (2, "spear", None), (3, "spear", None),
-                                              (1, "shield", None), (2, "shield", None),
-                                              (1, "trump", None), (2, "trump", None),
-                                              (3, "mana", "rage")],
+                                 card_list = [(1, "spear", "attack_2"), (2, "spear", "attack_1"), (3, "spear", "attack_1"),
+                                              (1, "shield", "defend_2"), (2, "shield", "defend_1"),
+                                              (1, "trump", "counter_1"), (2, "trump", "counter_1"),
+                                              (1, "mana", "cast_rage")],
                                  skill_list = [],
                                  story_keywords = ["heretic"])
         elif self.select_character.thief_button.is_left_clicked():
@@ -44,10 +44,10 @@ class Game:
                                  name = "thief",
                                  hp = 3,
                                  max_defense = 5,
-                                 card_list = [(1, "shield", None), (2, "spear", None),
-                                              (1, "shield", None), (2, "shield", None), (3, "shield", None),
-                                              (2, "mana", "hide"),
-                                              (1, "trump", None), (1, "trump", None)],
+                                 card_list = [(1, "spear", "attack_2"), (2, "spear", "attack_1"),
+                                              (1, "shield", "defend_2"), (2, "shield", "defend_1"), (3, "shield", "defend_1"),
+                                              (1, "mana", "cast_hide"),
+                                              (1, "trump", "counter_1"), (1, "trump", "counter_1")],
                                  skill_list = [],
                                  story_keywords = ["thief"])
         elif self.select_character.witch_button.is_left_clicked():
@@ -55,10 +55,10 @@ class Game:
                                  name = "witch",
                                  hp = 3,
                                  max_defense = 5,
-                                 card_list = [(2, "mana", "mage armor"), (2, "mana", "weakness"), (1, "mana", "bolt"),
-                                              (1, "shield", None), (2, "shield", None),
-                                              (1, "spear", None),
-                                              (1, "trump", None), (2, "trump", None)],
+                                 card_list = [(2, "mana", "cast_armor"), (1, "mana", "cast_weakness"), (3, "mana", "cast_bolt"),
+                                              (1, "shield", "defend_2"), (2, "shield", "defend_1"),
+                                              (1, "spear", "attack_1"),
+                                              (1, "trump", "counter_1"), (2, "trump", "counter_1")],
                                  skill_list = [],
                                  story_keywords = ["witch"])
             

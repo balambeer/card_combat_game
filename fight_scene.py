@@ -73,9 +73,14 @@ class TrickResolverActions:
                 
     def did_leading_player_win_trick(self, leading_card, trailing_card):
         if leading_card.suit == trailing_card.suit:
-            return leading_card.value <= trailing_card.value
+            return leading_card.value >= trailing_card.value
         else:
             return (not trailing_card.suit == "trump")
+        
+    def get_card_effect(self, card):
+        last_word_of_effect = card.effect.split(" ")[-1]
+        last_word_parsed = last_word_of_effect.split("_")
+        return (last_word_parsed[0], last_word_parsed[1])
         
     def modify_damage_based_on_conditions(self, did_fighter_1_win_trick, damage):
         modified_damage = damage
@@ -100,7 +105,7 @@ class TrickResolverActions:
             if self.fight_scene.fighter_2.has_condition("enraged"):
                 print("    fighter 2 enraged, damage +1")
                 modified_damage += 1
-            if self.fight_scene.fighter_2.has_condition("enraged"):
+            if self.fight_scene.fighter_2.has_condition("weakened"):
                 print("    fighter 2 is weakened, damage -1")
                 modified_damage -= 1
             if self.fight_scene.fighter_2.has_condition("hidden"):
@@ -135,14 +140,14 @@ class TrickResolverActions:
         # attack spells
         if spell_name == "bolt":
             return ("attack", 1)
-        elif spell_name == "chill touch":
+        elif spell_name == "chilltouch":
             return ("attack", 1)
         elif spell_name == "howl":
             return ("attack", 2)
         
         # defense spells
-        elif spell_name == "mage armor":
-            return ("defense", 2)
+        elif spell_name == "armor":
+            return ("defend", 2)
             
         # buffs
         elif spell_name == "hide":
@@ -171,7 +176,7 @@ class TrickResolverActions:
             damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick,
                                                             spell_effects[1])
             self.designate_attack_actions(did_fighter_1_win_trick, damage)
-        elif spell_effects[0] == "defense":
+        elif spell_effects[0] == "defend":
             self.designate_defend_actions(did_fighter_1_win_trick, max(1, spell_effects[1] // 2))
         elif spell_effects[0] == "buff" or spell_effects[0] == "nerf":
             if did_fighter_1_win_trick:
@@ -222,23 +227,26 @@ class TrickResolverActions:
         else:
             winning_card = trailing_card
             losing_card = leading_card
+            
+        winning_effect = self.get_card_effect(winning_card)
+        losing_effect = self.get_card_effect(losing_card)
         
-        if winning_card.suit == "spear":
-            damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick, winning_card.value)
-            if losing_card.suit == "shield":
-                damage = max(0, damage - losing_card.value)
+        if winning_effect[0] == "attack":
+            damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick, int(winning_effect[1]))
+            if losing_effect[0] == "defend":
+                damage = max(0, damage - int(losing_effect[1]))
             self.designate_attack_actions(did_fighter_1_win_trick, damage)
-        elif winning_card.suit == "shield":
-            defense = max(1, winning_card.value // 2)
+        elif winning_effect[0] == "defend":
+            defense = max(1, int(winning_effect[1]) // 2)
             self.designate_defend_actions(did_fighter_1_win_trick, defense)
-        elif winning_card.suit == "mana":
-            spell_name = winning_card.effect
+        elif winning_effect[0] == "cast":
+            spell_name = winning_effect[1]
             self.designate_casting_actions(did_fighter_1_win_trick, spell_name)
-        elif winning_card.suit == "trump":
+        elif winning_effect[0] == "counter":
             if leading_player_won_trick:
-                damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick, winning_card.value)
-                if losing_card.suit == "shield":
-                    damage = max(0, damage - losing_card.value)
+                damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick, int(winning_effect[1]))
+                if losing_effect[0] == "shield":
+                    damage = max(0, damage - int(losing_effect[1]))
                 self.designate_attack_actions(did_fighter_1_win_trick, damage)
             else:
                 self.designate_riposte_actions(did_fighter_1_win_trick)
@@ -255,8 +263,8 @@ class TrickResolverActions:
             trailing_card = self.fight_scene.fighter_1.play_area.card_list[0]
             
         leading_player_won_trick = self.did_leading_player_win_trick(leading_card, trailing_card)
-        print("  leading player played " + str(leading_card.value) + " of " + leading_card.suit)
-        print("  trailing player played " + str(trailing_card.value) + " of " + trailing_card.suit)
+        print("  leading player played " + str(leading_card.value) + " of " + leading_card.suit + "; " + leading_card.effect)
+        print("  trailing player played " + str(trailing_card.value) + " of " + trailing_card.suit + "; " + trailing_card.effect)
         print("    leading player won the trick: " + str(leading_player_won_trick))
         
         self.designate_actions(leading_player_won_trick,
