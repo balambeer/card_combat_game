@@ -332,8 +332,9 @@ class Fighter:
                 self.character_animation_frame = constants.player_character_animation_blocked_frame_count
         
     def gain_condition(self, condition):
-        self.fresh_conditions.append(condition)
-        self.render_conditions()
+        if not self.has_condition(condition):
+            self.fresh_conditions.append(condition)
+            self.render_conditions()
         
     ### card handling
         
