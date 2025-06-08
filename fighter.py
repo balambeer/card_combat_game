@@ -213,8 +213,8 @@ class Fighter:
         
     ### Update
         
-    def listen_to_card_played(self):
-        self.hand.update()
+    def listen_to_card_played(self, opponent_card_played):
+        self.hand.update(opponent_card_played)
         if not self.hand.selected_card_index is None:
             if not pg.mouse.get_pressed()[0]:
                 if self.play_area.deck_rect.collidepoint(pg.mouse.get_pos()):
@@ -461,7 +461,7 @@ class Fighter:
         
         if self.state == "my_turn":
             if self.is_human_controlled:
-                self.listen_to_card_played()
+                self.listen_to_card_played(opponent_card_played)
             else:
                 self.listen_to_ai_input(opponent_card_played)
         elif self.state == "animating":

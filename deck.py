@@ -83,13 +83,21 @@ class Deck:
         
     def is_empty(self):
         return len(self.card_list) == 0
+    
+    def can_play_this_card(self, card, opponent_card_played):
+        if opponent_card_played is None:
+            return True
+        else:
+            return (opponent_card_played.suit == card.suit or card.suit == "trump")
             
-    def update(self):
+    def update(self, opponent_card_played):
         if self.selected_card_index is None:
             self.active_card_index = None
+            can_play_this_card_list = [ self.can_play_this_card(card, opponent_card_played) for card in self.card_list ]
             for i in range(len(self.card_list)):
                 if self.card_list[i].is_mouse_over():
-                    self.active_card_index = i
+                    if ((not any(can_play_this_card_list)) or can_play_this_card_list[i]):
+                        self.active_card_index = i
             if not self.active_card_index is None:
                 if pg.mouse.get_pressed()[0]:
                     self.selected_card_index = self.active_card_index
