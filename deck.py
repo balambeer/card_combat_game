@@ -84,6 +84,12 @@ class Deck:
     def is_empty(self):
         return len(self.card_list) == 0
     
+    def contains_matching_suit(self, opponent_card_played):
+        if opponent_card_played is None:
+            return False
+        else:
+            return any([ card.suit == opponent_card_played.suit for card in self.card_list ])
+    
     def can_play_this_card(self, card, opponent_card_played):
         if opponent_card_played is None:
             return True
@@ -94,9 +100,10 @@ class Deck:
         if self.selected_card_index is None:
             self.active_card_index = None
             can_play_this_card_list = [ self.can_play_this_card(card, opponent_card_played) for card in self.card_list ]
+            contains_matching_suit = self.contains_matching_suit(opponent_card_played)
             for i in range(len(self.card_list)):
                 if self.card_list[i].is_mouse_over():
-                    if ((not any(can_play_this_card_list)) or can_play_this_card_list[i]):
+                    if ((not contains_matching_suit) or can_play_this_card_list[i]):
                         self.active_card_index = i
             if not self.active_card_index is None:
                 if pg.mouse.get_pressed()[0]:
