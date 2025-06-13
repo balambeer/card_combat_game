@@ -256,7 +256,7 @@ class Fighter:
             self.ai_timer -= self.game.delta_time
             
     ### Animation
-                
+
     def perform_defend(self, defense_boost):
         defense_boost_capped = min(defense_boost, self.max_defense - self.defense)
         self.defense = self.defense + defense_boost_capped
@@ -269,6 +269,22 @@ class Fighter:
     
         self.character_animation_state = "defend"
         self.character_animation_frame = constants.player_character_animation_defend_frame_count
+        
+    def perform_attack_defend(self, defense_boost, is_killing_blow):
+        if not is_killing_blow:
+            defense_boost_capped = min(defense_boost, self.max_defense - self.defense)
+            self.defense = self.defense + defense_boost_capped
+            self.defense_rendered = self.render_defense()
+            self.defense_rect = self.set_defense_rect()
+            
+            self.defense_boost_animation_clock = constants.player_defense_boost_animation_length_in_ms
+            self.defense_boost_rendered = self.font.render(str(defense_boost_capped), False, self.color)
+            self.defense_boost_rect = self.defense_boost_rendered.get_rect(midbottom = self.defense_rect.midtop)
+        
+            self.character_animation_state = "attack+defend"
+            self.character_animation_frame = constants.player_character_animation_defend_frame_count
+        else:
+            self.perform_killing_blow()
         
     def perform_cast(self):
         self.character_animation_state = "cast"
