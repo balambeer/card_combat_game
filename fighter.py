@@ -12,6 +12,7 @@ class Fighter:
                  is_human_controlled,
                  hp,
                  max_defense,
+                 armor,
                  card_list,
                  show_hand,
                  color):
@@ -25,15 +26,18 @@ class Fighter:
         self.color = color
         self.hp = hp
         self.defense = max_defense // 2
+        self.armor = armor
         self.max_defense = max_defense
         self.fresh_conditions = []
         self.waning_conditions = []
         
         self.font = pg.font.Font(None, constants.player_hp_size)
-        self.hp_rendered = self.render_hp() # self.font.render("HP: " + str(self.hp), False, self.color)
+        self.hp_rendered = self.render_hp()
         self.hp_rect = self.set_hp_rect(self.is_left_player)
-        self.defense_rendered = self.render_defense() # self.font.render("S: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
-        self.defense_rect = self.set_defense_rect() # self.sress_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+        self.defense_rendered = self.render_defense()
+        self.defense_rect = self.set_defense_rect()
+        self.armor_rendered = self.render_armor()
+        self.armor_rect = self.set_armor_rect()
         self.name_rendered = self.font.render(name, False, self.color)
         self.name_rect = self.set_name_rect()
         self.conditions_rendered = self.font.render("", False, self.color)
@@ -142,7 +146,10 @@ class Fighter:
     
     def render_defense(self):
         return self.font.render("Def: " + str(self.defense) + " (" + str(self.max_defense) + ")", False, self.color)
-        
+    
+    def render_armor(self):
+        return self.font.render("A: " + str(self.armor), False, self.color)
+    
     def render_conditions(self):
         conditions = self.fresh_conditions + self.waning_conditions
         conditions_string = ""
@@ -152,7 +159,7 @@ class Fighter:
             else:
                 conditions_string += conditions[i]
         self.conditions_rendered = self.font.render(conditions_string, False, self.color)
-        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.defense_rect.bottomleft)
+        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.armor_rect.bottomleft)
         
     def set_hp_rect(self, is_left_player):
         hp_rect_center_left = int(constants.player_hp_rect_center_ratio[0] * constants.screen_width)
@@ -163,6 +170,9 @@ class Fighter:
     
     def set_defense_rect(self):
         return self.defense_rendered.get_rect(topleft = self.hp_rect.bottomleft)
+    
+    def set_armor_rect(self):
+        return self.armor_rendered.get_rect(topleft = self.defense_rect.bottomleft)
     
     def set_name_rect(self):
         return self.name_rendered.get_rect(bottomleft = self.hp_rect.topleft)
@@ -179,9 +189,10 @@ class Fighter:
     def display_name(self):
         self.game.program.screen.blit(self.name_rendered, self.name_rect)
     
-    def display_hp_and_defense(self):
+    def display_hp_and_defense_and_armor(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
         self.game.program.screen.blit(self.defense_rendered, self.defense_rect)
+        self.game.program.screen.blit(self.armor_rendered, self.armor_rect)
         
     def display_damage(self):
         self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - constants.player_damage_drift_v * self.game.delta_time),
@@ -205,7 +216,7 @@ class Fighter:
         self.play_area.draw()
         self.display_character()
         self.display_name()
-        self.display_hp_and_defense()
+        self.display_hp_and_defense_and_armor()
         self.display_conditions()
         if self.damage_animation_clock > 0:
             self.damage_animation_clock -= self.game.delta_time
@@ -315,8 +326,9 @@ class Fighter:
     ### Combat interactions
                 
     def take_damage(self, damage, was_riposte):
-        defense_damage = min(damage, self.defense)
-        hp_damage = damage - defense_damage
+        base_damage = damage - self.armor
+        defense_damage = min(base_damage, self.defense)
+        hp_damage = base_damage - defense_damage
         self.defense = self.defense - defense_damage
         self.hp = max(0, self.hp - hp_damage)
         self.hp_rendered = self.render_hp() # self.font.render(str(self.hp), False, self.color)
@@ -324,9 +336,9 @@ class Fighter:
         self.defense_rendered = self.render_defense()
         self.defense_rect = self.set_defense_rect()
         
-        if damage > 0:
+        if base_damage > 0:
             self.damage_animation_clock = constants.player_damage_animation_length_in_ms
-            self.damage_rendered = self.font.render(str(-damage), False, self.color)
+            self.damage_rendered = self.font.render(str(-base_damage), False, self.color)
             self.damage_rect = self.damage_rendered.get_rect(midbottom = self.hp_rect.midtop)
             
             if self.hp > 0:
@@ -351,7 +363,7 @@ class Fighter:
         if not self.has_condition(condition):
             self.fresh_conditions.append(condition)
             self.render_conditions()
-        elif condition in self.waning_conditions():
+        elif condition in self.waning_conditions:
             self.fresh_conditions.append(condition)
             self.waning_conditions.remove(condition)
         

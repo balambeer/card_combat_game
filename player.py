@@ -5,6 +5,7 @@ class Player:
                  name,
                  hp,
                  max_defense,
+                 armor,
                  card_list,
                  skill_list,
                  story_keywords):
@@ -13,6 +14,7 @@ class Player:
         self.name = name
         self.hp = hp
         self.max_defense = max_defense
+        self.armor = armor
         self.card_list = card_list
         self.skill_list = skill_list
         self.story_keywords = story_keywords

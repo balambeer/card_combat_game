@@ -152,6 +152,7 @@ class DungeonMaster:
                            is_human_controlled = False,
                            hp = monster_row[self.monster_manual.col_name_to_index["hp"]],
                            max_defense = monster_row[self.monster_manual.col_name_to_index["max_defense"]],
+                           armor = monster_row[self.monster_manual.col_name_to_index["armor"]],
                            card_list = monster_row[self.monster_manual.col_name_to_index["card_list"]],
                            show_hand = False,
                            color = "tomato")
@@ -177,6 +178,7 @@ class DungeonMaster:
                                  is_human_controlled = True,
                                  hp = self.game.player.hp,
                                  max_defense = self.game.player.max_defense,
+                                 armor = self.game.player.armor,
                                  card_list = self.game.player.card_list,
                                  show_hand = True,
                                  color = "cornflowerblue")
