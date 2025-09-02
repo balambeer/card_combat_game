@@ -5,6 +5,15 @@ import math
 from card import *
 from deck import *
 
+class Damage:
+    def __init__(self,
+                 amount,
+                 ignores_armor,
+                 ignores_defense):
+        self.amount = amount
+        self.ignores_armor = ignores_armor
+        self.ignores_defense = ignores_defense
+
 class Fighter:
     def __init__(self, game,
                  name,
@@ -65,8 +74,17 @@ class Fighter:
      
     ### Status
      
-    def damage_tolerance(self):
-        return self.hp + self.defense
+    def can_survive_damage(self, damage):
+        if damage.ignores_armor and damage.ignores_defense:
+            hp_damage = damage.amount
+        elif damage.ignores_armor and not damage.ignores_defense:
+            hp_damage = max(0, damage.amount - self.defense)
+        elif not damage.ignores_armor and damage.ignores_defense:
+            hp_damage = max(0, damage.amount - self.armor)
+        else:
+            hp_damage = max(0, damage.amount - self.armor - self.defense)
+        
+        return self.hp > hp_damage
         
     def has_condition(self, condition):
         return condition in self.fresh_conditions or condition in self.waning_conditions
@@ -326,11 +344,25 @@ class Fighter:
     ### Combat interactions
                 
     def take_damage(self, damage, was_riposte):
-        base_damage = damage - self.armor
-        defense_damage = min(base_damage, self.defense)
-        hp_damage = base_damage - defense_damage
+        
+        if not damage.ignores_armor:
+            print("    armor reduced damage by " + str(self.armor))
+            base_damage = damage.amount - self.armor
+        else:
+            print("    attack bypasses armor.")
+            base_damage = damage.amount
+        
+        if not damage.ignores_defense:
+            defense_damage = min(base_damage, self.defense)
+            hp_damage = base_damage - defense_damage
+        else:
+            print("    attack bypasses defense.")
+            defense_damage = 0
+            hp_damage = base_damage
+        
         self.defense = self.defense - defense_damage
         self.hp = max(0, self.hp - hp_damage)
+        
         self.hp_rendered = self.render_hp() # self.font.render(str(self.hp), False, self.color)
         self.hp_rect = self.set_hp_rect(self.is_left_player)
         self.defense_rendered = self.render_defense()
@@ -504,7 +536,7 @@ class Fighter:
                 if self.todo == "nothing": # means that the card animation finished
                     if self.has_condition("poisoned"):
                         # TODO: this probably won't work
-                        self.take_damage(1, False)
+                        self.take_damage(Damage(1, True, True), False)
                     self.update_conditions()
             elif self.todo == "draw_a_card_to_hand":
                 self.draw_a_card_to_hand()

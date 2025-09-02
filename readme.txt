@@ -24,14 +24,11 @@ Systems:
 - rewards after combat (i.e. deckbuilding, also a must)
 - settings/options menu + rules description (toggler between AI controlled and human controlled opponents)
 - build vertical slice demo
-- attacks (spells) that bypass defense (poison, chill touch)?
-- all suits do damage (except trump?). Necessary, because otherwise no incentive to use other suits (aka other suits just don't threaten as much)
 
 Current stuff
 -------------
 - cardplay stuff
-  - attacks bypassing defense
-  - all suits must do damage (except trump?)
+  - new trick resolver: effect based on winning suit (maybe losing as well?), value is the losing card
 - demo
   - build map, write stories
 

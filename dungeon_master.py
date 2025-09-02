@@ -1,5 +1,6 @@
 import csv
 import pygame as pg
+from pathlib import Path
 import constants
 from point_crawl import *
 from fight_scene import *
@@ -19,7 +20,8 @@ class DataTable:
 
     def read_csv(self, path):
         raw_table = []
-        with open(path) as csv_file:
+        full_path = f"{Path(__file__).parent}" + "\\" + path
+        with open(full_path) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 raw_table.append(row)
@@ -76,10 +78,10 @@ class DungeonMaster:
     def __init__(self, game):
         self.game = game
         
-        self.scene_library = DataTable(self, "encounters/scene_library.csv")
-        self.point_crawl = DataTable(self, "encounters/point_crawl.csv")
-        self.monster_manual = DataTable(self, "encounters/monster_manual.csv")
-        self.travel_encounters = DataTable(self, "encounters/travel_encounters.csv")
+        self.scene_library = DataTable(self, "encounters\\scene_library.csv")
+        self.point_crawl = DataTable(self, "encounters\\point_crawl.csv")
+        self.monster_manual = DataTable(self, "encounters\\monster_manual.csv")
+        self.travel_encounters = DataTable(self, "encounters\\travel_encounters.csv")
         
         self.current_scene_index = None
         
