@@ -22,6 +22,7 @@ class Fighter:
                  hp,
                  max_defense,
                  armor,
+                 spell_list,
                  card_list,
                  show_hand,
                  color):
@@ -37,6 +38,7 @@ class Fighter:
         self.defense = max_defense // 2
         self.armor = armor
         self.max_defense = max_defense
+        self.spell_list = spell_list
         self.fresh_conditions = []
         self.waning_conditions = []
         
@@ -49,8 +51,10 @@ class Fighter:
         self.armor_rect = self.set_armor_rect()
         self.name_rendered = self.font.render(name, False, self.color)
         self.name_rect = self.set_name_rect()
+        self.spell_list_rendered = self.render_spell_list()
+        self.spell_list_rect = self.set_spell_list_rect()
         self.conditions_rendered = self.font.render("", False, self.color)
-        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.defense_rect.bottomleft)
+        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.spell_list_rect.bottomleft)
         
         self.state = "clean_up"
         self.todo = "nothing"
@@ -167,6 +171,12 @@ class Fighter:
     
     def render_armor(self):
         return self.font.render("A: " + str(self.armor), False, self.color)
+
+    def render_spell_list(self):
+        spell_list_string = ""
+        for key in self.spell_list:
+            spell_list_string += str(key) + ": " + self.spell_list[key] + "; "
+        return  self.font.render(spell_list_string, False, self.color)
     
     def render_conditions(self):
         conditions = self.fresh_conditions + self.waning_conditions
@@ -177,7 +187,7 @@ class Fighter:
             else:
                 conditions_string += conditions[i]
         self.conditions_rendered = self.font.render(conditions_string, False, self.color)
-        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.armor_rect.bottomleft)
+        self.conditions_rect = self.conditions_rendered.get_rect(topleft = self.spell_list_rect.bottomleft)
         
     def set_hp_rect(self, is_left_player):
         hp_rect_center_left = int(constants.player_hp_rect_center_ratio[0] * constants.screen_width)
@@ -192,6 +202,9 @@ class Fighter:
     def set_armor_rect(self):
         return self.armor_rendered.get_rect(topleft = self.defense_rect.bottomleft)
     
+    def set_spell_list_rect(self):
+        return self.spell_list_rendered.get_rect(topleft = self.armor_rect.bottomleft)
+    
     def set_name_rect(self):
         return self.name_rendered.get_rect(bottomleft = self.hp_rect.topleft)
     
@@ -203,14 +216,14 @@ class Fighter:
         character_animation_rect_y = constants.player_character_animation_center_y
         return self.character_animation_rendered.get_rect(center = (character_animation_rect_x, character_animation_rect_y))
 
-    
     def display_name(self):
         self.game.program.screen.blit(self.name_rendered, self.name_rect)
     
-    def display_hp_and_defense_and_armor(self):
+    def display_static_character_info(self):
         self.game.program.screen.blit(self.hp_rendered, self.hp_rect)
         self.game.program.screen.blit(self.defense_rendered, self.defense_rect)
         self.game.program.screen.blit(self.armor_rendered, self.armor_rect)
+        self.game.program.screen.blit(self.spell_list_rendered, self.spell_list_rect)
         
     def display_damage(self):
         self.damage_rect.update((self.damage_rect.left, self.damage_rect.top - constants.player_damage_drift_v * self.game.delta_time),
@@ -234,7 +247,7 @@ class Fighter:
         self.play_area.draw()
         self.display_character()
         self.display_name()
-        self.display_hp_and_defense_and_armor()
+        self.display_static_character_info()
         self.display_conditions()
         if self.damage_animation_clock > 0:
             self.damage_animation_clock -= self.game.delta_time

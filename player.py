@@ -8,6 +8,7 @@ class Player:
                  armor,
                  card_list,
                  skill_list,
+                 spell_list,
                  story_keywords):
         self.program = program
         
@@ -17,6 +18,7 @@ class Player:
         self.armor = armor
         self.card_list = card_list
         self.skill_list = skill_list
+        self.spell_list = spell_list
         self.story_keywords = story_keywords
        
     # redundant?

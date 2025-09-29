@@ -39,6 +39,7 @@ class Game:
                                               (1, "trump", None), (2, "trump", None),
                                               (3, "mana", "rage")],
                                  skill_list = [],
+                                 spell_list = {1: "rage"},
                                  story_keywords = ["heretic"])
         elif self.select_character.thief_button.is_left_clicked():
             self.player = Player(program = self.program,
@@ -51,6 +52,7 @@ class Game:
                                               (2, "mana", "hide"),
                                               (1, "trump", None), (1, "trump", None)],
                                  skill_list = [],
+                                 spell_list = {1: "hide"},
                                  story_keywords = ["thief"])
         elif self.select_character.witch_button.is_left_clicked():
             self.player = Player(program = self.program,
@@ -63,6 +65,7 @@ class Game:
                                               (1, "spear", None),
                                               (1, "trump", None), (2, "trump", None)],
                                  skill_list = [],
+                                 spell_list = {1: "mage armor", 2: "weakness", 3: "bolt"},
                                  story_keywords = ["witch"])
             
     def resolve_scene_effect(self, effect):

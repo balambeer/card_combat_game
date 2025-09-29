@@ -23,7 +23,7 @@ class TrickResolverActions:
                 
     def did_leading_player_win_trick(self, leading_card, trailing_card):
         if leading_card.suit == trailing_card.suit:
-            return leading_card.value <= trailing_card.value
+            return leading_card.value >= trailing_card.value
         else:
             return (not trailing_card.suit == "trump")
         
@@ -82,6 +82,17 @@ class TrickResolverActions:
             print("    fighter 2 defends " + str(defense))
             self.fight_scene.fighter_2.perform_defend(defense)
             self.fight_scene.fighter_1.perform_flatfooted()
+
+    def find_spell_name(self, fighter_spell_list, spell_level):
+        level = spell_level
+        while level > 0:
+            if level in fighter_spell_list:
+                return fighter_spell_list[level]
+            else:
+                level -= 1
+        
+        if level == 0:
+            raise Exception("find_spell_name: fighter_spells don't contain spells of level 1 or above.")
             
     # Returns tuple (spell_type, spell_effect)
     def spell_effect_library(self, spell_name):
@@ -164,7 +175,7 @@ class TrickResolverActions:
             self.fight_scene.fighter_2.perform_riposte(False)
             self.fight_scene.fighter_1.take_damage(Damage(0, False, False), True)
         
-    def designate_actions(self, leading_player_won_trick, leading_card, trailing_card):
+    def designate_actions(self, leading_player_won_trick, leading_card, trailing_card, fighter_1_spell_list, fighter_2_spell_list):
         did_fighter_1_win_trick = ( (self.fight_scene.is_fighter_1_leading and
                                      leading_player_won_trick) or
                                    ( (not self.fight_scene.is_fighter_1_leading) and
@@ -178,22 +189,26 @@ class TrickResolverActions:
         
         if winning_card.suit == "spear":
             damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick,
-                                                            Damage(winning_card.value, False, False))
+                                                            Damage(losing_card.value, False, False))
             if losing_card.suit == "shield":
-                damage.amount = max(0, damage.amount - losing_card.value)
+                damage.amount = max(0, damage.amount - 1)
             self.designate_attack_actions(did_fighter_1_win_trick, damage)
         elif winning_card.suit == "shield":
-            defense = max(1, winning_card.value // 2)
+            defense = max(1, losing_card.value // 2)
             self.designate_defend_actions(did_fighter_1_win_trick, defense)
         elif winning_card.suit == "mana":
-            spell_name = winning_card.effect
+            # TODO: spellcasting will be different! The value of the losing card determines which spell is cast!
+            if did_fighter_1_win_trick:
+                spell_name = self.find_spell_name(fighter_1_spell_list, losing_card.value)
+            else:
+                spell_name = self.find_spell_name(fighter_2_spell_list, losing_card.value)
             self.designate_casting_actions(did_fighter_1_win_trick, spell_name)
         elif winning_card.suit == "trump":
             if leading_player_won_trick:
                 damage = self.modify_damage_based_on_conditions(did_fighter_1_win_trick,
-                                                                Damage(winning_card.value, False, False))
+                                                                Damage(losing_card.value, False, False))
                 if losing_card.suit == "shield":
-                    damage.amount = max(0, damage.amount - losing_card.value)
+                    damage.amount = max(0, damage.amount - 1)
                 self.designate_attack_actions(did_fighter_1_win_trick, damage)
             else:
                 self.designate_riposte_actions(did_fighter_1_win_trick)
@@ -216,7 +231,9 @@ class TrickResolverActions:
         
         self.designate_actions(leading_player_won_trick,
                                leading_card,
-                               trailing_card)
+                               trailing_card,
+                               self.fight_scene.fighter_1.spell_list,
+                               self.fight_scene.fighter_2.spell_list)
                 
         if not leading_player_won_trick:
             self.fight_scene.is_fighter_1_leading = not self.fight_scene.is_fighter_1_leading

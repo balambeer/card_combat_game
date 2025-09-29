@@ -45,6 +45,12 @@ class DataTable:
         
         return [ process_card(x) for x in card_list ]
     
+    def process_spell_list(self, spelllist_string):
+        stripped_string = spelllist_string.strip("[]")
+        spell_list = stripped_string.split(";")
+
+        return { (index + 1): spell_list[index] for index in range(len(spell_list)) }
+    
     def process_neighborlist(self, neighborlist_string):
         stripped_string = neighborlist_string.strip("[]")
         
@@ -70,6 +76,8 @@ class DataTable:
                         processed_row[j] = self.process_cardlist(processed_row[j])
                     elif types[j] == "neighborlist":
                         processed_row[j] = self.process_neighborlist(processed_row[j])
+                    elif types[j] == "spelllist":
+                        processed_row[j] = self.process_spell_list(processed_row[j])
             self.data.append(processed_row)
         
         self.col_name_to_index = dict([ (self.header[i], i) for i in range(len(self.header)) ])
@@ -156,6 +164,7 @@ class DungeonMaster:
                            max_defense = monster_row[self.monster_manual.col_name_to_index["max_defense"]],
                            armor = monster_row[self.monster_manual.col_name_to_index["armor"]],
                            card_list = monster_row[self.monster_manual.col_name_to_index["card_list"]],
+                           spell_list = monster_row[self.monster_manual.col_name_to_index["spell_list"]],
                            show_hand = False,
                            color = "tomato")
         
@@ -181,6 +190,7 @@ class DungeonMaster:
                                  hp = self.game.player.hp,
                                  max_defense = self.game.player.max_defense,
                                  armor = self.game.player.armor,
+                                 spell_list = self.game.player.spell_list,
                                  card_list = self.game.player.card_list,
                                  show_hand = True,
                                  color = "cornflowerblue")
